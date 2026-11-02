@@ -18,6 +18,13 @@ Um roteiro de dois minutos para a banca:
 4. Volte ao painel: em **Hoje** estão o alerta de urgência e o conflito de interesses, esperando a decisão do advogado.
 5. Abra **Registro de conduta**: tudo o que aconteceu está lá, com as verificações feitas.
 
+## Acesso da administração
+
+Para quem mantém a plataforma (a equipe Bivexa), sem OAB. Mostra a visão geral (escritórios, clientes, consultas, contratos, honorários, mensagens bloqueadas) e permite abrir o painel de qualquer escritório. Cada acesso fica gravado no registro de conduta do escritório.
+
+- **No seu computador:** já vem ligado. Endereço `http://127.0.0.1:5000/admin/entrar`, e-mail `admin@bivexa.app`, senha `admin-bivexa-2026` (aparecem no terminal ao rodar o app).
+- **No Render:** o acesso só liga depois que vocês definem `ADMIN_EMAIL` e `ADMIN_SENHA` no painel do serviço (Environment). Usem uma senha forte: o site é público.
+
 ## Para quem é
 
 Para o advogado que atende os próprios clientes, faz os próprios contratos e cobra os próprios honorários, sem secretária. Segundo a pesquisa Perfil ADV (OAB e FGV, 2024), 72% da advocacia brasileira atua de forma autônoma.
@@ -91,7 +98,7 @@ Os testes percorrem o caminho inteiro de um cliente (do primeiro contato ao paga
 
 1. Crie uma conta em [render.com](https://render.com), entrando com o GitHub.
 2. No painel, clique em **New → Blueprint** e escolha este repositório. O arquivo `render.yaml` já diz tudo o que o Render precisa.
-3. Quando pedir `GROQ_API_KEY`, cole a chave do Groq (ou deixe em branco para usar só as regras fixas).
+3. O Render vai pedir três valores: `GROQ_API_KEY` (a chave do Groq, ou em branco para usar só as regras fixas), `ADMIN_EMAIL` e `ADMIN_SENHA` (o login da administração).
 4. Clique em **Apply**. Em alguns minutos, o endereço aparece no topo da página do serviço.
 
 **Atenção:** no plano gratuito, o Render "dorme" depois de 15 minutos sem uso (o primeiro acesso demora cerca de 1 minuto) e apaga o banco de dados quando reinicia. A conta de demonstração é recriada sozinha. Abram o link alguns minutos antes da apresentação.
@@ -106,6 +113,7 @@ bivexa/regras.py        regras fixas: conduta, urgência, conflito, datas, dinhe
 bivexa/ia.py            chamadas ao modelo de linguagem, com plano de reserva
 bivexa/servicos.py      o que o produto faz: atender, aprovar, propor, contratar, cobrar
 bivexa/painel.py        telas do advogado
+bivexa/admin.py         administração da plataforma (equipe Bivexa)
 bivexa/publico.py       telas do cliente: atendimento, proposta, contrato, pagamento
 bivexa/templates/       HTML das telas
 bivexa/static/          visual (CSS) e logo

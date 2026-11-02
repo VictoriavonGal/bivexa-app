@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Administração · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="estreito">
+  <div class="stack-s">
+    <span class="label">Equipe Bivexa</span>
+    <h1>Acesso da administração</h1>
+    <p class="muted">Para quem mantém a plataforma. Advogados e escritórios entram <a href="{{ url_for('entrar') }}">por aqui</a>.</p>
+  </div>
+  {% if desligado %}
+    <p class="aviso info">O acesso da administração está desligado neste servidor. Para ligar, defina as variáveis ADMIN_EMAIL e ADMIN_SENHA (ver o README).</p>
+  {% else %}
+  <form method="post" class="stack">
+    {{ csrf_campo() }}
+    <label class="campo">E-mail da administração<input type="email" name="email" autocomplete="username" required></label>
+    <label class="campo">Senha<input type="password" name="senha" autocomplete="current-password" required></label>
+    <button class="btn btn-red">Entrar na administração</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

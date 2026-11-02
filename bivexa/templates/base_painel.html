@@ -29,6 +29,12 @@
     </div>
   </aside>
   <main class="conteudo">
+    {% if eh_admin %}
+    <div class="aviso info row between">
+      <span>Você está vendo este painel como <strong>administradora da Bivexa</strong>.</span>
+      <form method="post" action="{{ url_for('admin.voltar') }}">{{ csrf_campo() }}<button class="btn btn-s">Voltar à administração</button></form>
+    </div>
+    {% endif %}
     {{ avisos() }}
     {% block conteudo %}{% endblock %}
   </main>

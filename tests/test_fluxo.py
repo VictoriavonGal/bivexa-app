@@ -209,3 +209,25 @@ def test_prazo_em_dias_uteis():
     from datetime import date
     # sexta, 6/11/2026 + 5 dias úteis = sexta, 13/11/2026
     assert regras.somar_dias_uteis(date(2026, 11, 6), 5) == date(2026, 11, 13)
+
+
+def test_administracao(app, monkeypatch):
+    adv, e = criar_escritorio(app)
+    gerente = app.test_client()
+    # Sem as variáveis de ambiente, a administração fica desligada
+    monkeypatch.delenv("ADMIN_EMAIL", raising=False)
+    assert "desligado" in gerente.get("/admin/entrar").get_data(as_text=True)
+    monkeypatch.setenv("ADMIN_EMAIL", "gerente@bivexa.app")
+    monkeypatch.setenv("ADMIN_SENHA", "senha-da-gerente")
+    # Senha errada não entra; sem login, a visão geral redireciona
+    assert "incorretos" in post(gerente, "/admin/entrar", email="gerente@bivexa.app", senha="x").get_data(as_text=True)
+    assert gerente.get("/admin/").status_code == 302
+    # Login certo: vê o escritório e abre o painel dele
+    html = post(gerente, "/admin/entrar", email="gerente@bivexa.app", senha="senha-da-gerente").get_data(as_text=True)
+    assert "Lima Advocacia" in html
+    html = post(gerente, f"/admin/escritorios/{e['id']}/abrir").get_data(as_text=True)
+    assert "administradora da Bivexa" in html
+    with app.app_context():
+        assert um("SELECT * FROM registro WHERE ator = 'Administração Bivexa'") is not None
+    # Um advogado comum não acessa a administração
+    assert adv.get("/admin/").status_code == 302

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}Administração · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <div class="stack-s"><span class="label">Administração da plataforma</span><h1>Visão geral da Bivexa</h1></div>
+</div>
+<section class="grid-4">
+  <div class="card"><span class="label">Escritórios cadastrados</span><span class="num">{{ numeros.escritorios }}</span></div>
+  <div class="card"><span class="label">Clientes atendidos</span><span class="num">{{ numeros.clientes }}</span><span class="small muted">{{ numeros.conversas }} conversa(s) no atendimento</span></div>
+  <div class="card"><span class="label">Consultas marcadas</span><span class="num">{{ numeros.consultas }}</span></div>
+  <div class="card"><span class="label">Contratos assinados</span><span class="num">{{ numeros.contratos }}</span><span class="small muted">{{ numeros.propostas }} proposta(s)</span></div>
+  <div class="card"><span class="label">Honorários contratados</span><span class="num">{{ contratado | moeda }}</span><span class="small muted">Recebido: {{ recebido | moeda }}</span></div>
+  <div class="card"><span class="label">Decisões pendentes</span><span class="num {{ 'red' if numeros.pendentes else '' }}">{{ numeros.pendentes }}</span><span class="small muted">somando todos os escritórios</span></div>
+  <div class="card"><span class="label">Mensagens bloqueadas</span><span class="num">{{ numeros.bloqueios }}</span><span class="small muted">por possível opinião jurídica</span></div>
+  <div class="card soft"><span class="label">Inteligência artificial</span><p class="small">{{ status_ia }}</p></div>
+</section>
+<section class="stack">
+  <h2>Escritórios</h2>
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Escritório</th><th>Responsável</th><th>E-mail</th><th>Clientes</th><th>Pendências</th><th>Última atividade</th><th></th></tr></thead>
+      <tbody>
+      {% for e in escritorios %}
+        <tr>
+          <td><strong>{{ e.nome }}</strong><br><span class="small muted">{{ 'configurado' if e.configurado else 'configuração incompleta' }} · desde {{ e.criado_em | data }}</span></td>
+          <td>{{ e.advogado_nome }}<br><span class="small muted">OAB {{ e.oab }}</span></td>
+          <td class="small">{{ e.email }}</td>
+          <td class="n">{{ e.n_clientes }}</td>
+          <td class="n">{{ e.n_pendentes }}</td>
+          <td class="n small">{{ e.ultima_atividade | data }}</td>
+          <td><form method="post" action="{{ url_for('admin.abrir_escritorio', escritorio_id=e.id) }}">{{ csrf_campo() }}<button class="btn btn-s">Ver o painel</button></form></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="muted">Nenhum escritório cadastrado ainda. Para criar um com exemplos, use "Entrar na demonstração" na página inicial.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">Ao abrir o painel de um escritório, o acesso fica gravado no registro de conduta dele.</p>
+</section>
+{% endblock %}

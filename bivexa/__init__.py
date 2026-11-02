@@ -39,8 +39,10 @@ def criar_app(config=None):
     _seguranca(app)
     _rotas_de_conta(app)
 
+    from .admin import admin
     from .painel import painel
     from .publico import publico
+    app.register_blueprint(admin)
     app.register_blueprint(painel)
     app.register_blueprint(publico)
     return app
@@ -77,7 +79,7 @@ def _filtros(app):
     @app.context_processor
     def globais():
         return {"status_ia": ia.descricao_status(), "escritorio": g.get("escritorio"),
-                "csrf": session.get("csrf", "")}
+                "csrf": session.get("csrf", ""), "eh_admin": bool(session.get("admin"))}
 
 
 # ---------------------------------------------------------------- segurança
@@ -132,6 +134,8 @@ def _criar_conta(nome, advogado, oab, email, senha, cidade="São Paulo", uf="SP"
 def _rotas_de_conta(app):
     @app.route("/")
     def inicio():
+        if session.get("admin") and not g.escritorio:
+            return redirect(url_for("admin.inicio"))
         if g.escritorio:
             return redirect(url_for("painel.hoje"))
         return render_template("inicio.html")
