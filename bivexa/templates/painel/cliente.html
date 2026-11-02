@@ -1,0 +1,113 @@
+{% extends "base_painel.html" %}
+{% from "_macros.html" import status_tag %}
+{% block titulo %}{{ c.nome }} · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <div class="stack-s">
+    <span class="label">Ficha do caso</span>
+    <h1>{{ c.nome }}</h1>
+    <div class="row">{{ status_tag(c.status) }}{% if c.urgente %}<span class="tag red">urgente</span>{% endif %}{% if c.conflito %}<span class="tag warn">conflito</span>{% endif %}</div>
+  </div>
+  <div class="row">
+    {% if c.status in ['novo contato', 'consulta marcada', 'proposta enviada'] %}
+      <a class="btn btn-red" href="{{ url_for('painel.nova_proposta', cliente_id=c.id) }}">Preparar proposta</a>
+    {% endif %}
+    <a class="btn" href="{{ url_for('publico.conversa', token=c.token) }}" target="_blank">Ver como o cliente vê</a>
+  </div>
+</div>
+
+{% if pendencias %}
+<div class="aviso erro">Há {{ pendencias | length }} decisão(ões) pendente(s) deste cliente em <a href="{{ url_for('painel.aprovacoes') }}">Aprovações</a>.</div>
+{% endif %}
+
+<section class="grid-2">
+  <div class="card">
+    <span class="label">Resumo para ler antes da consulta</span>
+    <p>{{ c.resumo or 'Sem resumo.' }}</p>
+    {% if c.motivo_urgencia %}<p class="small"><strong>Urgência:</strong> {{ c.motivo_urgencia }}</p>{% endif %}
+    <span class="label">Documentos a pedir</span>
+    <p class="small">{{ c.documentos_pendentes or '—' }}</p>
+  </div>
+  <div class="card">
+    <table>
+      <tbody>
+        <tr><th>Área</th><td>{{ c.area or '—' }}</td></tr>
+        <tr><th>Contato</th><td>{{ c.contato or '—' }}</td></tr>
+        <tr><th>Parte contrária</th><td>{{ c.parte_contraria or 'nenhuma informada' }}</td></tr>
+        <tr><th>Conflito</th><td>{{ c.conflito or 'nenhum encontrado' }}</td></tr>
+        <tr><th>Origem</th><td>{{ c.origem }} · {{ c.criado_em | data }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% if c.relato %}
+<section class="card soft"><span class="label">Relato, nas palavras do cliente</span><p>{{ c.relato }}</p></section>
+{% endif %}
+
+<section class="grid-2">
+  <div class="stack">
+    <h2>Agenda</h2>
+    {% for k in compromissos %}
+      <div class="card"><div class="row"><span class="tag">{{ k.tipo }}</span><strong>{{ k.inicio | extenso }}</strong></div><p class="small muted">{{ k.titulo }}</p></div>
+    {% else %}<p class="vazio">Nenhum compromisso.</p>{% endfor %}
+  </div>
+  <div class="stack">
+    <h2>Proposta e contrato</h2>
+    {% for p in propostas %}
+      <details class="card">
+        <summary class="row between"><span>Proposta · {{ p.valor_total | moeda }} em {{ p.parcelas }}x</span>{{ status_tag(p.status) }}</summary>
+        <div class="documento small">{{ p.texto }}</div>
+        {% if p.status in ['aguardando aprovação', 'em revisão'] %}<a class="btn btn-s" href="{{ url_for('painel.editar_proposta', proposta_id=p.id) }}">Revisar o texto</a>{% endif %}
+      </details>
+    {% endfor %}
+    {% for k in contratos %}
+      <details class="card">
+        <summary class="row between"><span>Contrato{% if k.assinado_por %} · assinado por {{ k.assinado_por }} em {{ k.assinado_em | data }}{% endif %}</span>{{ status_tag(k.status) }}</summary>
+        <div class="documento small">{{ k.texto }}</div>
+        {% if k.status in ['aguardando aprovação', 'em revisão'] %}<a class="btn btn-s" href="{{ url_for('painel.editar_contrato', contrato_id=k.id) }}">Revisar o texto</a>{% endif %}
+      </details>
+    {% endfor %}
+    {% if not propostas and not contratos %}<p class="vazio">Depois da consulta, use "Preparar proposta".</p>{% endif %}
+  </div>
+</section>
+
+{% if parcelas %}
+<section class="stack">
+  <h2>Honorários</h2>
+  <div class="tabela-wrap"><table>
+    <thead><tr><th>Parcela</th><th>Valor</th><th>Vencimento</th><th>Situação</th><th></th></tr></thead>
+    <tbody>{% for p in parcelas %}
+      <tr><td class="n">{{ p.numero }}/{{ p.total_parcelas }}</td><td class="n">{{ p.valor | moeda }}</td><td class="n">{{ p.vencimento | data }}</td><td>{{ status_tag(p.status) }}</td>
+      <td>{% if p.status in ['emitida','atrasada'] %}<form class="inline" method="post" action="{{ url_for('painel.marcar_paga', parcela_id=p.id) }}">{{ csrf_campo() }}<button class="btn btn-s">Registrar pagamento</button></form>{% endif %}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>
+</section>
+{% endif %}
+
+{% if processos %}
+<section class="stack-s">
+  <h2>Processos</h2>
+  {% for p in processos %}<a href="{{ url_for('painel.processo', processo_id=p.id) }}">{{ p.numero }} · {{ p.tribunal }}</a>{% endfor %}
+</section>
+{% endif %}
+
+<section class="grid-2">
+  <div class="stack">
+    <h2>Conversa</h2>
+    <div class="chat-caixa conversa-painel">
+      {% for m in mensagens %}
+        <div class="msg {{ m.autor }}">{{ m.texto | linkar }}<small>{{ 'Cliente' if m.autor == 'cliente' else 'Bivexa' }} · {{ m.criado_em | data }}</small></div>
+      {% else %}<p class="small muted">Sem mensagens.</p>{% endfor %}
+    </div>
+  </div>
+  <div class="stack">
+    <h2>Registro de conduta</h2>
+    <div class="linha-tempo">
+      {% for r in registros %}
+        <div class="evento"><time>{{ r.criado_em | data }}</time><div><strong>{{ r.acao }}</strong> <span class="small muted">· {{ r.ator }}</span>{% if r.detalhe %}<p class="small muted">{{ r.detalhe }}</p>{% endif %}{% if r.verificacoes %}<p class="verif">✓ {{ r.verificacoes }}</p>{% endif %}</div></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

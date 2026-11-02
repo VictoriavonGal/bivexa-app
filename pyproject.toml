@@ -1,0 +1,18 @@
+[project]
+name = "bivexa-ai"
+version = "0.1.0"
+description = "Assistente administrativa para o escritório do advogado autônomo e do escritório boutique."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.1",
+    "gunicorn>=23",
+    "requests>=2.32",
+    "tzdata",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,5 @@
+<nav class="row" aria-label="Configurações">
+  {% for ep, nome in [('painel.configuracoes','Escritório e horários'),('painel.honorarios','Tabela de honorários'),('painel.modelos','Modelos de proposta e contrato'),('painel.conflitos','Lista de conflitos')] %}
+    <a class="btn btn-s {{ 'btn-red' if request.endpoint == ep else '' }}" href="{{ url_for(ep) }}">{{ nome }}</a>
+  {% endfor %}
+</nav>

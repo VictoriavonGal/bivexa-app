@@ -1,0 +1,84 @@
+{% macro logo() -%}
+<svg viewBox="0 0 100 100" aria-hidden="true">
+  <path d="M16 10 H60 C82 10 84 44 62 48 H44 L34 38 H58 C66 38 66 22 58 22 H28 Z" fill="var(--red)"/>
+  <path d="M22 26 H34 V90 H22 Z" fill="var(--red-deep)"/>
+  <path d="M34 52 H64 C90 54 88 92 62 92 H24 L34 80 H60 C72 80 72 64 60 64 H34 Z" fill="var(--red)"/>
+</svg>
+{%- endmacro %}
+
+{% macro avisos() -%}
+{% with msgs = get_flashed_messages(with_categories=true) %}
+{% if msgs %}
+<div class="avisos" role="status">
+  {% for cat, m in msgs %}<p class="aviso {{ cat }}">{{ m }}</p>{% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+{%- endmacro %}
+
+{% macro status_tag(status) -%}
+{% set cores = {
+  'aguardando aprovação': 'red', 'em revisão': 'warn', 'enviada': '', 'aceita': 'ok', 'enviado para assinatura': '',
+  'assinado': 'ok', 'programada': '', 'emitida': '', 'atrasada': 'red', 'paga': 'ok', 'pendente': 'red',
+  'aprovada': 'ok', 'recusada': 'warn', 'resolvida': 'ok', 'contratado': 'ok', 'recusado': 'warn'
+} %}
+<span class="tag {{ cores.get(status, '') }}">{{ status }}</span>
+{%- endmacro %}
+
+{% macro pendencia_card(p, rotulo_sim, rotulo_nao) -%}
+<article class="card {{ 'urgente' if p.urgente else '' }}">
+  <div class="pendencia">
+    <div class="stack-s">
+      <div class="row">
+        {% if p.urgente %}<span class="tag red">urgente</span>{% endif %}
+        <span class="label">{{ p.criado_em | data }}</span>
+      </div>
+      <h3>{{ p.titulo }}{% if p.cliente_nome %} · {{ p.cliente_nome }}{% endif %}</h3>
+      <p class="muted">{{ p.descricao }}</p>
+      {% if p.cliente_id %}<a class="small" href="{{ url_for('painel.cliente', cliente_id=p.cliente_id) }}">Abrir a ficha do cliente</a>{% endif %}
+    </div>
+    <div class="acoes">
+      <form class="inline" method="post" action="{{ url_for('painel.decidir', pid=p.id, acao='aprovar') }}">
+        {{ csrf_campo() }}<button class="btn btn-red btn-s">{{ rotulo_sim.get(p.tipo, 'Aprovar') }}</button>
+      </form>
+      {% if rotulo_nao.get(p.tipo) %}
+      <form class="inline" method="post" action="{{ url_for('painel.decidir', pid=p.id, acao='recusar') }}">
+        {{ csrf_campo() }}<button class="btn btn-outline-red btn-s">{{ rotulo_nao.get(p.tipo) }}</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro form_horarios(horarios, dias, e) -%}
+<fieldset class="stack" style="border:0;padding:0;margin:0">
+  <div class="stack-s">
+    <span class="label">Dias de atendimento</span>
+    <div class="dias">
+      {% for d in dias %}
+      <label><input type="checkbox" name="dias" value="{{ loop.index0 }}" {% if loop.index0 in horarios.dias %}checked{% endif %}> {{ d }}</label>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="grid-4">
+    <label class="campo">Início<input type="time" name="inicio" value="{{ horarios.inicio }}"></label>
+    <label class="campo">Fim<input type="time" name="fim" value="{{ horarios.fim }}"></label>
+    <label class="campo">Intervalo começa<input type="time" name="almoco_inicio" value="{{ horarios.almoco_inicio }}"></label>
+    <label class="campo">Intervalo termina<input type="time" name="almoco_fim" value="{{ horarios.almoco_fim }}"></label>
+  </div>
+  <div class="grid-2">
+    <label class="campo">Duração da consulta
+      <select name="duracao">
+        {% for m in [30, 45, 60, 90] %}<option value="{{ m }}" {% if e.duracao_consulta == m %}selected{% endif %}>{{ m }} minutos</option>{% endfor %}
+      </select>
+    </label>
+    <label class="campo">Lembrar o cliente do vencimento
+      <select name="lembrete_dias">
+        {% for d in [1, 2, 3, 5, 7] %}<option value="{{ d }}" {% if e.lembrete_dias == d %}selected{% endif %}>{{ d }} dia(s) antes</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+  <label class="check"><input type="checkbox" name="video" {% if e.consulta_por_video %}checked{% endif %}> Também atendo por vídeo</label>
+</fieldset>
+{%- endmacro %}

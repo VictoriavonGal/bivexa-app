@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block titulo %}Página não encontrada · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="estreito">
+  <h1>{% if erro.code == 404 %}Não encontramos esta página.{% else %}Não foi possível concluir.{% endif %}</h1>
+  <p class="muted">{% if erro.code == 404 %}O endereço pode estar errado, ou o documento ainda não foi liberado pelo escritório.{% else %}{{ erro.description }}{% endif %}</p>
+  <a class="btn" href="{{ url_for('inicio') }}">Voltar ao início</a>
+</div>
+{% endblock %}

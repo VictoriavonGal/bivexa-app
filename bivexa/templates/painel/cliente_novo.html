@@ -1,0 +1,20 @@
+{% extends "base_painel.html" %}
+{% block titulo %}Cadastrar cliente · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho"><div class="stack-s"><span class="label">Clientes</span><h1>Cadastrar cliente</h1></div></div>
+<form method="post" class="stack" style="max-width:720px">
+  {{ csrf_campo() }}
+  <div class="grid-2">
+    <label class="campo">Nome completo<input type="text" name="nome" value="{{ dados.get('nome','') }}" required></label>
+    <label class="campo">Telefone ou e-mail<input type="text" name="contato" value="{{ dados.get('contato','') }}"></label>
+  </div>
+  <div class="grid-2">
+    <label class="campo">Parte contrária<span class="ajuda">A Bivexa confere conflito de interesses com este nome.</span><input type="text" name="parte_contraria" value="{{ dados.get('parte_contraria','') }}"></label>
+    <label class="campo">Área<span class="ajuda">Em branco: a Bivexa sugere pelo relato.</span>
+      <select name="area"><option value="">Sugerir pelo relato</option>{% for a in areas %}<option>{{ a }}</option>{% endfor %}</select>
+    </label>
+  </div>
+  <label class="campo">Relato do caso<textarea name="relato">{{ dados.get('relato','') }}</textarea></label>
+  <div class="row"><a class="btn" href="{{ url_for('painel.clientes') }}">Cancelar</a><button class="btn btn-red">Cadastrar e conferir conflito</button></div>
+</form>
+{% endblock %}

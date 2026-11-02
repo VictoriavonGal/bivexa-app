@@ -1,0 +1,20 @@
+{% extends "base_painel.html" %}
+{% block titulo %}Registro de conduta · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho"><div class="stack-s"><span class="label">Tudo o que saiu em seu nome</span><h1>Registro de conduta</h1></div></div>
+<p class="muted" style="max-width:72ch">Cada mensagem, cada conferência de conflito e cada aprovação fica aqui, com data, hora e as verificações feitas. Se o atendimento for questionado, a prova está pronta.</p>
+<div class="linha-tempo">
+  {% for r in linhas %}
+    <div class="evento">
+      <time>{{ r.criado_em | data }}</time>
+      <div>
+        <strong>{{ r.acao }}</strong> <span class="small muted">· {{ r.ator }}{% if r.cliente_nome %} · <a href="{{ url_for('painel.cliente', cliente_id=r.cliente_id) }}">{{ r.cliente_nome }}</a>{% endif %}</span>
+        {% if r.detalhe %}<p class="small muted">{{ r.detalhe }}</p>{% endif %}
+        {% if r.verificacoes %}<p class="verif">✓ {{ r.verificacoes }}</p>{% endif %}
+      </div>
+    </div>
+  {% else %}
+    <p class="vazio">Nada registrado ainda.</p>
+  {% endfor %}
+</div>
+{% endblock %}

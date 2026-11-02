@@ -1,0 +1,20 @@
+{% extends "base_painel.html" %}
+{% block titulo %}Preparar proposta · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho"><div class="stack-s"><span class="label">{{ c.nome }}</span><h1>Preparar proposta de honorários</h1></div></div>
+<p class="muted" style="max-width:70ch">Escolha o serviço da sua tabela e escreva, numa frase, o que vai fazer. A Bivexa monta a proposta no seu modelo e a coloca em Aprovações. Nada é enviado ao cliente antes do seu "sim".</p>
+<form method="post" class="stack" style="max-width:720px">
+  {{ csrf_campo() }}
+  <label class="campo">Serviço da tabela
+    <select name="servico_id" id="servico" required>
+      {% for s in tabela %}<option value="{{ s.id }}" data-valor="{{ '%.2f' | format(s.valor_total) | replace('.', ',') }}" data-parcelas="{{ s.parcelas }}" {% if c.area and s.area == c.area and loop.first %}selected{% endif %}>{{ s.nome }} · {{ s.area }} · {{ s.valor_total | moeda }} em {{ s.parcelas }}x</option>{% endfor %}
+    </select>
+  </label>
+  <label class="campo">Em uma frase, o que você vai fazer<span class="ajuda">Ex.: "alimentos para a filha de 6 anos, inicial e acompanhamento até a sentença".</span><input type="text" name="frase" required></label>
+  <div class="grid-2">
+    <label class="campo">Valor total (R$)<span class="ajuda">Em branco: o valor da tabela.</span><input type="text" name="valor" id="valor" placeholder="valor da tabela"></label>
+    <label class="campo">Parcelas<span class="ajuda">Em branco: as da tabela.</span><input type="number" min="1" max="24" name="parcelas" id="parcelas" placeholder="da tabela"></label>
+  </div>
+  <div class="row"><a class="btn" href="{{ url_for('painel.cliente', cliente_id=c.id) }}">Cancelar</a><button class="btn btn-red">Preparar e mandar para aprovação</button></div>
+</form>
+{% endblock %}

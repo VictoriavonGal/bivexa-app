@@ -1,0 +1,34 @@
+{% extends "base_painel.html" %}
+{% from "_macros.html" import pendencia_card, status_tag %}
+{% block titulo %}Aprovações · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <div class="stack-s">
+    <span class="label">Nada sai em seu nome sem o seu "sim"</span>
+    <h1>Aprovações</h1>
+  </div>
+</div>
+<p class="muted" style="max-width:70ch">Proposta, contrato, primeira cobrança, datas de processo e avisos ao cliente esperam aqui. Confirmação de horário e lembretes de vencimento saem sozinhos, sempre conferidos contra opinião jurídica.</p>
+<section class="stack">
+  {% for p in pendencias %}
+    {{ pendencia_card(p, rotulo_sim, rotulo_nao) }}
+  {% else %}
+    <p class="vazio">Nenhuma decisão pendente.</p>
+  {% endfor %}
+</section>
+{% if resolvidas %}
+<section class="stack">
+  <h2>Decididas recentemente</h2>
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Quando</th><th>O quê</th><th>Cliente</th><th>Decisão</th></tr></thead>
+      <tbody>
+      {% for p in resolvidas %}
+        <tr><td class="n">{{ p.resolvido_em | data }}</td><td>{{ p.titulo }}</td><td>{{ p.cliente_nome or '—' }}</td><td>{{ status_tag(p.status) }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

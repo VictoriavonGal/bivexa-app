@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "_macros.html" import logo, avisos %}
+{% block titulo %}Atendimento · {{ e.nome }}{% endblock %}
+{% block corpo %}
+<div class="pagina">
+  <header class="topo">
+    <div class="stack-s"><strong>{{ e.nome }}</strong><span class="small muted">{{ e.advogado_nome }} · OAB {{ e.oab }}{% if e.cidade %} · {{ e.cidade }}/{{ e.uf }}{% endif %}</span></div>
+    <span class="small muted por-bivexa">{{ logo() | safe }} Bivexa AI</span>
+  </header>
+  <main class="chat" style="padding:24px 0 40px">
+    {{ avisos() }}
+    <p class="small muted">Você está falando com a <strong>assistente virtual</strong> do escritório. Ela marca consultas e organiza o seu atendimento, mas não dá orientação jurídica: quem avalia o caso é {{ e.advogado_nome }}.</p>
+    <div class="chat-caixa" aria-live="polite">
+      {% if not mensagens %}
+        <div class="msg bivexa">Olá! Conte, em poucas palavras, o que aconteceu e como o escritório pode ajudar.<small>Assistente virtual</small></div>
+      {% endif %}
+      {% for m in mensagens %}
+        <div class="msg {{ m.autor }}">{{ m.texto | linkar }}<small>{{ 'Você' if m.autor == 'cliente' else 'Assistente virtual' }} · {{ m.criado_em[11:16] }}</small></div>
+      {% endfor %}
+      <span id="fim"></span>
+    </div>
+    {% if not cliente or cliente.etapa_conversa != 'encerrada' %}
+    <form method="post" class="chat-form">
+      {{ csrf_campo() }}
+      <textarea name="texto" placeholder="Escreva sua mensagem" aria-label="Sua mensagem" required autofocus></textarea>
+      <button class="btn btn-red">Enviar</button>
+    </form>
+    {% endif %}
+    {% if cliente %}
+    <form method="post" class="row between">
+      {{ csrf_campo() }}<input type="hidden" name="acao" value="recomecar">
+      <span class="small muted">Versão de demonstração. Não envie dados pessoais reais.</span>
+      <button class="btn-link small">Começar outra conversa</button>
+    </form>
+    {% endif %}
+  </main>
+</div>
+<script>
+  // Mantém a conversa rolada até a última mensagem e envia com Enter.
+  const caixa = document.querySelector('.chat-caixa');
+  if (caixa) caixa.scrollTop = caixa.scrollHeight;
+  const campo = document.querySelector('.chat-form textarea');
+  if (campo) campo.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); campo.form.requestSubmit(); }
+  });
+</script>
+{% endblock %}

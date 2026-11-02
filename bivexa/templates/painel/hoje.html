@@ -1,0 +1,52 @@
+{% extends "base_painel.html" %}
+{% from "_macros.html" import pendencia_card %}
+{% block titulo %}Hoje · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <div class="stack-s">
+    <span class="label">{{ hoje_extenso }}</span>
+    <h1>{% if pendencias %}{{ pendencias | length }} decisão(ões) esperando você{% else %}Nada esperando o seu "sim"{% endif %}</h1>
+  </div>
+  <a class="btn" href="{{ url_for('publico.atendimento', slug=escritorio.slug) }}" target="_blank">Abrir o atendimento ao cliente</a>
+</div>
+
+<section class="grid-4">
+  <div class="card"><span class="label">Decisões pendentes</span><span class="num {{ 'red' if pendencias else '' }}">{{ pendencias | length }}</span></div>
+  <div class="card"><span class="label">Novos contatos (7 dias)</span><span class="num">{{ novos }}</span></div>
+  <div class="card"><span class="label">A receber neste mês</span><span class="num">{{ financeiro.a_receber | moeda }}</span><span class="small muted">Recebido: {{ financeiro.recebido | moeda }}</span></div>
+  <div class="card {{ 'urgente' if financeiro.atrasado else '' }}"><span class="label">Em atraso</span><span class="num {{ 'red' if financeiro.atrasado else '' }}">{{ financeiro.atrasado | moeda }}</span></div>
+</section>
+
+<section class="stack">
+  <div class="row between"><h2>Precisa de você</h2><a class="small" href="{{ url_for('painel.aprovacoes') }}">Ver histórico de aprovações</a></div>
+  {% for p in pendencias %}
+    {{ pendencia_card(p, rotulo_sim, rotulo_nao) }}
+  {% else %}
+    <p class="vazio">Tudo em dia. Quando a Bivexa preparar algo que sai em seu nome, aparece aqui.</p>
+  {% endfor %}
+</section>
+
+<section class="stack">
+  <div class="row between"><h2>Próximos 7 dias</h2><a class="small" href="{{ url_for('painel.agenda') }}">Abrir a agenda</a></div>
+  {% for k in compromissos %}
+    <article class="card">
+      <div class="row between">
+        <div class="row"><span class="tag {{ 'red' if k.tipo == 'prazo' else '' }}">{{ k.tipo }}</span><strong>{{ k.inicio | extenso }}</strong></div>
+        {% if k.cid %}<a class="small" href="{{ url_for('painel.cliente', cliente_id=k.cid) }}">Ficha do caso</a>{% endif %}
+      </div>
+      <p>{{ k.titulo }}</p>
+      {% if k.tipo == 'consulta' and k.resumo %}<p class="small muted">Leia antes: {{ k.resumo }}</p>{% endif %}
+    </article>
+  {% else %}
+    <p class="vazio">Nenhum compromisso nos próximos 7 dias.</p>
+  {% endfor %}
+</section>
+
+{% if not tem_exemplos %}
+<section class="card soft">
+  <h3>Quer ver a Bivexa funcionando antes de divulgar o link?</h3>
+  <p class="muted">Abra o seu link de atendimento numa aba anônima e converse como se fosse um cliente. Ou carregue dois clientes de exemplo.</p>
+  <form method="post" action="{{ url_for('painel.exemplos') }}">{{ csrf_campo() }}<button class="btn btn-s">Carregar exemplos</button></form>
+</section>
+{% endif %}
+{% endblock %}

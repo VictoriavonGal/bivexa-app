@@ -1,0 +1,30 @@
+{% extends "base_painel.html" %}
+{% block titulo %}Lista de conflitos · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho"><div class="stack-s"><span class="label">Configurações</span><h1>Lista de conflitos de interesses</h1></div></div>
+{% include "painel/_config_abas.html" %}
+<p class="muted" style="max-width:72ch">Antes de marcar qualquer consulta, a Bivexa compara o nome de quem procura o escritório e o da parte contrária com esta lista. Clientes e partes contrárias entram aqui sozinhos quando um contrato é assinado; você também pode incluir nomes de casos antigos.</p>
+<section class="grid-2">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Nome</th><th>Papel</th><th></th></tr></thead>
+      <tbody>
+      {% for p in partes %}
+        <tr><td>{{ p.nome }}{% if p.observacao %} <span class="small muted">· {{ p.observacao }}</span>{% endif %}</td><td>{{ p.papel }}</td>
+        <td><form class="inline" method="post">{{ csrf_campo() }}<input type="hidden" name="acao" value="remover"><input type="hidden" name="parte_id" value="{{ p.id }}"><button class="btn-link small">remover</button></form></td></tr>
+      {% else %}
+        <tr><td colspan="3" class="muted">Lista vazia.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <form method="post" class="card stack">
+    {{ csrf_campo() }}
+    <h3>Incluir nome</h3>
+    <label class="campo">Nome da pessoa ou empresa<input type="text" name="nome" required></label>
+    <label class="campo">Papel<select name="papel"><option value="cliente">cliente (atual ou antigo)</option><option value="parte contrária">parte contrária</option></select></label>
+    <label class="campo">Observação<input type="text" name="observacao"></label>
+    <button class="btn btn-red">Incluir</button>
+  </form>
+</section>
+{% endblock %}

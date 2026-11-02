@@ -1,0 +1,31 @@
+{% extends "base_painel.html" %}
+{% block titulo %}Processos · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho"><div class="stack-s"><span class="label">Depois que o caso começa</span><h1>Processos</h1></div></div>
+<section class="grid-2">
+  <div class="stack">
+    {% for p in processos %}
+      <a class="card" style="text-decoration:none;color:inherit" href="{{ url_for('painel.processo', processo_id=p.id) }}">
+        <span class="mono">{{ p.numero }}</span><strong>{{ p.cliente_nome }}</strong><span class="small muted">{{ p.tribunal }} · {{ p.n }} publicação(ões) lida(s)</span>
+      </a>
+    {% else %}
+      <p class="vazio">Nenhum processo conectado.</p>
+    {% endfor %}
+  </div>
+  <form method="post" class="card stack">
+    {{ csrf_campo() }}
+    <h3>Conectar um processo</h3>
+    {% if clientes %}
+    <label class="campo">Cliente<select name="cliente_id" required>{% for c in clientes %}<option value="{{ c.id }}">{{ c.nome }}</option>{% endfor %}</select></label>
+    <label class="campo">Número do processo<input type="text" name="numero" placeholder="0000000-00.0000.0.00.0000" required></label>
+    <label class="campo">Tribunal e vara<input type="text" name="tribunal" placeholder="TJSP – 2ª Vara de Família" required></label>
+    <label class="campo">Descrição<input type="text" name="descricao"></label>
+    <label class="check"><input type="checkbox" name="autorizado"> <span>Autorizo a Bivexa a consultar este processo com o meu acesso, só para leitura. Vale também para processos em segredo de justiça em que atuo.</span></label>
+    <button class="btn btn-red">Conectar</button>
+    {% else %}
+    <p class="small muted">Só clientes com contrato assinado aparecem aqui.</p>
+    {% endif %}
+  </form>
+</section>
+<p class="small muted">Nesta versão de demonstração, a consulta automática aos tribunais é simulada: você cola a publicação na página do processo e a Bivexa faz o resto.</p>
+{% endblock %}

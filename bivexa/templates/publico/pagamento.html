@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avisos, status_tag %}
+{% block titulo %}Pagamento · {{ e.nome }}{% endblock %}
+{% block corpo %}
+<div class="pagina">
+  <header class="topo"><div class="stack-s"><strong>{{ e.nome }}</strong><span class="small muted">{{ e.advogado_nome }} · OAB {{ e.oab }}</span></div></header>
+  <main class="estreito">
+    {{ avisos() }}
+    <h1>Honorários · parcela {{ p.numero }}/{{ p.total_parcelas }}</h1>
+    <div class="card">
+      <div class="row between"><span class="label">Valor</span><span class="num">{{ p.valor | moeda }}</span></div>
+      <div class="row between"><span class="label">Vencimento</span><strong>{{ p.vencimento | data }}</strong></div>
+      <div class="row between"><span class="label">Situação</span>{{ status_tag(p.status) }}</div>
+      {% if p.status != 'paga' %}
+        <span class="label">Pix copia e cola</span>
+        <code class="mono">{{ p.codigo_pagamento }}</code>
+        <p class="small muted">Código de demonstração: não é um Pix real.</p>
+      {% endif %}
+    </div>
+    {% if p.status in ['emitida', 'atrasada'] %}
+      <form method="post">{{ csrf_campo() }}<button class="btn btn-red">Simular pagamento</button></form>
+    {% endif %}
+    <a href="{{ url_for('publico.conversa', token=c.token) }}">Voltar à conversa com o escritório</a>
+  </main>
+</div>
+{% endblock %}

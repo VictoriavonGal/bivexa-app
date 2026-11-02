@@ -1,0 +1,31 @@
+{% extends "base_painel.html" %}
+{% block titulo %}{{ p.numero }} · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <div class="stack-s"><span class="label">{{ p.tribunal }}</span><h1 class="mono" style="font-size:1.3rem">{{ p.numero }}</h1><a href="{{ url_for('painel.cliente', cliente_id=c.id) }}">{{ c.nome }}</a></div>
+</div>
+<form method="post" class="card stack">
+  {{ csrf_campo() }}
+  <h3>Nova publicação</h3>
+  <p class="small muted">Simula a chegada de uma publicação. A Bivexa resume, sugere a data para a agenda e rascunha o aviso ao cliente. A data e o aviso esperam o seu "sim".</p>
+  <textarea name="texto" id="texto" required></textarea>
+  <div class="row">
+    <button class="btn btn-red">Ler publicação</button>
+    <button type="button" class="btn btn-s" onclick="document.getElementById('texto').value = {{ exemplo | tojson }}">Usar um exemplo</button>
+  </div>
+</form>
+<section class="stack">
+  <h2>Publicações lidas</h2>
+  {% for a in andamentos %}
+    <article class="card">
+      <span class="label">{{ a.criado_em | data }}</span>
+      <p><strong>Resumo:</strong> {{ a.resumo }}</p>
+      {% if a.data_sugerida %}<p><span class="tag red">{{ a.tipo_data }}</span> sugerida para <strong>{{ a.data_sugerida | data }}</strong></p>{% endif %}
+      <p class="small muted">Aviso ao cliente: "{{ a.mensagem_cliente }}"</p>
+      <details><summary class="small">Texto original</summary><p class="small">{{ a.texto }}</p></details>
+    </article>
+  {% else %}
+    <p class="vazio">Nenhuma publicação ainda.</p>
+  {% endfor %}
+</section>
+{% endblock %}

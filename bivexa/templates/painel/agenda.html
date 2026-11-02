@@ -1,0 +1,39 @@
+{% extends "base_painel.html" %}
+{% block titulo %}Agenda · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho"><div class="stack-s"><span class="label">Atendimento: {{ horarios }}</span><h1>Agenda</h1></div></div>
+<section class="grid-2">
+  <div class="stack">
+    {% for dia, itens in dias.items() %}
+      <div class="stack-s">
+        <span class="label">{{ dia | extenso }}</span>
+        {% for k in itens %}
+          <div class="card {{ 'urgente' if k.tipo == 'prazo' else '' }}">
+            <div class="row between"><div class="row"><span class="tag {{ 'red' if k.tipo == 'prazo' else '' }}">{{ k.tipo }}</span><strong>{{ k.inicio[11:16] if k.tipo != 'prazo' else 'até o fim do dia' }}</strong></div>
+            {% if k.cliente_id %}<a class="small" href="{{ url_for('painel.cliente', cliente_id=k.cliente_id) }}">{{ k.cliente_nome }}</a>{% endif %}</div>
+            <p>{{ k.titulo }}</p>{% if k.observacao %}<p class="small muted">{{ k.observacao }}</p>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="vazio">Nenhum compromisso daqui para frente.</p>
+    {% endfor %}
+  </div>
+  <div class="stack">
+    <div class="card soft">
+      <span class="label">Próximos horários livres para consulta</span>
+      {% for l in livres %}<p>{{ l | extenso }}</p>{% else %}<p class="small muted">Nenhum horário livre nos próximos 20 dias.</p>{% endfor %}
+      <p class="small muted">São estes que a Bivexa oferece aos clientes.</p>
+    </div>
+    <form method="post" class="card stack">
+      {{ csrf_campo() }}
+      <h3>Incluir compromisso</h3>
+      <label class="campo">Tipo<select name="tipo"><option value="consulta">Consulta</option><option value="audiência">Audiência</option><option value="prazo">Prazo</option><option value="reunião">Reunião</option><option value="compromisso">Outro</option></select></label>
+      <label class="campo">Descrição<input type="text" name="titulo" required></label>
+      <div class="grid-2"><label class="campo">Data<input type="date" name="data" required></label><label class="campo">Hora<input type="time" name="hora" value="09:00"></label></div>
+      <label class="campo">Cliente<select name="cliente_id"><option value="">Sem cliente</option>{% for c in clientes %}<option value="{{ c.id }}">{{ c.nome }}</option>{% endfor %}</select></label>
+      <button class="btn btn-red">Incluir</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

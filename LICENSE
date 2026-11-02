@@ -1,0 +1,9 @@
+Copyright (c) 2026 Bivexa AI. Todos os direitos reservados.
+
+Este repositório é público para avaliação acadêmica (APS de Ciência de Dados
+Aplicada ao Direito I, Insper, 2026/2). Ver o código não concede permissão
+para usá-lo, copiá-lo, modificá-lo ou distribuí-lo sem autorização escrita
+dos autores.
+
+As bibliotecas de terceiros usadas por este projeto (Flask, Gunicorn,
+Requests e suas dependências) continuam sob as próprias licenças abertas.

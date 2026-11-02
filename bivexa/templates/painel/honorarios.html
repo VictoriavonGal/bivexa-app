@@ -1,0 +1,42 @@
+{% extends "base_painel.html" %}
+{% block titulo %}Tabela de honorários · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho"><div class="stack-s"><span class="label">Configurações</span><h1>Tabela de honorários</h1></div></div>
+{% include "painel/_config_abas.html" %}
+<p class="muted" style="max-width:72ch">As propostas partem destes valores. Se você der um valor menor na hora, a Bivexa avisa antes do envio. Confira a tabela de honorários da OAB do seu estado.</p>
+<form method="post" class="stack">
+  {{ csrf_campo() }}
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Ativo</th><th>Serviço</th><th>Área</th><th>Valor total (R$)</th><th>Parcelas</th></tr></thead>
+      <tbody>
+      {% for s in servicos %}
+        <tr>
+          <td><input type="checkbox" name="s{{ s.id }}_ativo" {% if s.ativo %}checked{% endif %} aria-label="Ativo"></td>
+          <td><input type="text" name="s{{ s.id }}_nome" value="{{ s.nome }}" aria-label="Serviço"></td>
+          <td class="muted">{{ s.area }}</td>
+          <td><input type="text" name="s{{ s.id }}_valor" value="{{ '%.2f' | format(s.valor_total) | replace('.', ',') }}" style="max-width:130px" aria-label="Valor"></td>
+          <td><input type="number" min="1" max="24" name="s{{ s.id }}_parcelas" value="{{ s.parcelas }}" style="max-width:80px" aria-label="Parcelas"></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="row"><button class="btn btn-red">Salvar tabela</button></div>
+</form>
+<form method="post" class="card stack" style="max-width:760px">
+  {{ csrf_campo() }}
+  <input type="hidden" name="acao" value="novo">
+  <h3>Incluir serviço</h3>
+  <div class="grid-2">
+    <label class="campo">Nome<input type="text" name="nome" required></label>
+    <label class="campo">Área<select name="area">{% for a in areas %}<option>{{ a }}</option>{% endfor %}</select></label>
+  </div>
+  <div class="grid-2">
+    <label class="campo">Valor total (R$)<input type="text" name="valor" required></label>
+    <label class="campo">Parcelas<input type="number" name="parcelas" min="1" max="24" value="1"></label>
+  </div>
+  <label class="campo">O que inclui<input type="text" name="descricao"></label>
+  <div class="row"><button class="btn">Incluir</button></div>
+</form>
+{% endblock %}

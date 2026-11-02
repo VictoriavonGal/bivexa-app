@@ -1,0 +1,39 @@
+{% from "_macros.html" import logo, avisos %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Bivexa AI{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112..125,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='logo.svg') }}">
+</head>
+<body>
+{% block corpo %}
+<div class="pagina">
+  <header class="topo">
+    <a class="brand" href="{{ url_for('inicio') }}">{{ logo() }}<span class="wordmark">BIVEXA <span>AI</span></span></a>
+    <nav class="row">
+      {% if escritorio %}
+        <a class="btn btn-s" href="{{ url_for('painel.hoje') }}">Ir para o painel</a>
+      {% else %}
+        <a class="btn btn-s" href="{{ url_for('entrar') }}">Entrar</a>
+        <a class="btn btn-red btn-s" href="{{ url_for('cadastro') }}">Criar conta</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="stack" style="padding-top:20px">
+    {{ avisos() }}
+    {% block conteudo %}{% endblock %}
+  </main>
+  <footer class="rodape">
+    <span>Bivexa AI · Projeto acadêmico · Insper 2026/2</span>
+    <span><a href="{{ url_for('privacidade') }}">Como tratamos os dados</a></span>
+  </footer>
+</div>
+{% endblock %}
+</body>
+</html>

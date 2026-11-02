@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avisos %}
+{% block titulo %}{{ tipo | capitalize }} · {{ e.nome }}{% endblock %}
+{% block corpo %}
+<div class="pagina">
+  <header class="topo"><div class="stack-s"><strong>{{ e.nome }}</strong><span class="small muted">{{ e.advogado_nome }} · OAB {{ e.oab }}</span></div></header>
+  <main class="stack" style="max-width:760px;margin:24px auto 48px">
+    {{ avisos() }}
+    <h1>{% if tipo == 'proposta' %}Proposta de honorários{% else %}Contrato de honorários{% endif %}</h1>
+    <div class="documento">{{ doc.texto }}</div>
+    {% if tipo == 'proposta' and doc.status == 'enviada' %}
+      <form method="post" class="card stack">
+        {{ csrf_campo() }}
+        <label class="check"><input type="checkbox" name="ciente"> <span>Li a proposta e quero contratar o escritório nestas condições.</span></label>
+        <button class="btn btn-red">Aceitar proposta</button>
+      </form>
+    {% elif tipo == 'contrato' and doc.status == 'enviado para assinatura' %}
+      <form method="post" class="card stack">
+        {{ csrf_campo() }}
+        <label class="campo">Assinatura: digite seu nome completo<input type="text" name="assinatura" required></label>
+        <label class="check"><input type="checkbox" name="ciente"> <span>Li o contrato e concordo com os seus termos.</span></label>
+        <button class="btn btn-red">Assinar contrato</button>
+        <p class="small muted">Assinatura eletrônica simulada, para demonstração.</p>
+      </form>
+    {% else %}
+      <p class="aviso ok">{% if tipo == 'proposta' %}Proposta aceita.{% else %}Contrato assinado por {{ doc.assinado_por }} em {{ doc.assinado_em | data }}.{% endif %}</p>
+    {% endif %}
+    <a href="{{ url_for('publico.conversa', token=c.token) }}">Voltar à conversa com o escritório</a>
+  </main>
+</div>
+{% endblock %}

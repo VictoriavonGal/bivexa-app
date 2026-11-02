@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_macros.html" import logo, avisos %}
+{% block corpo %}
+{% set n_pend = pendentes_count() %}
+<div class="app">
+  <aside class="lateral">
+    <a class="brand" href="{{ url_for('painel.hoje') }}">{{ logo() }}<span class="wordmark">BIVEXA <span>AI</span></span></a>
+    <div class="stack-s">
+      <strong>{{ escritorio.nome }}</strong>
+      <span class="small muted">{{ escritorio.advogado_nome }} · OAB {{ escritorio.oab }}</span>
+    </div>
+    <nav aria-label="Painel">
+      {% set itens = [
+        ('painel.hoje', 'Hoje'), ('painel.aprovacoes', 'Aprovações'), ('painel.clientes', 'Clientes'),
+        ('painel.agenda', 'Agenda'), ('painel.financeiro', 'Financeiro'), ('painel.processos', 'Processos'),
+        ('painel.registro', 'Registro de conduta'), ('painel.configuracoes', 'Configurações')] %}
+      {% for ep, nome in itens %}
+      <a href="{{ url_for(ep) }}" class="{{ 'ativo' if request.endpoint == ep or (ep == 'painel.configuracoes' and request.endpoint in ['painel.honorarios','painel.modelos','painel.conflitos']) or (ep == 'painel.clientes' and request.endpoint in ['painel.cliente','painel.novo_cliente','painel.nova_proposta']) or (ep == 'painel.processos' and request.endpoint == 'painel.processo') }}">
+        <span>{{ nome }}</span>
+        {% if ep == 'painel.aprovacoes' and n_pend %}<span class="badge">{{ n_pend }}</span>{% endif %}
+      </a>
+      {% endfor %}
+    </nav>
+    <div class="stack-s" style="margin-top:auto">
+      <span class="label">Seu link de atendimento</span>
+      <a class="small" href="{{ url_for('publico.atendimento', slug=escritorio.slug) }}" target="_blank">/atendimento/{{ escritorio.slug }}</a>
+      <span class="status-ia">{{ status_ia }}</span>
+      <form method="post" action="{{ url_for('sair') }}">{{ csrf_campo() }}<button class="btn-link small">Sair</button></form>
+    </div>
+  </aside>
+  <main class="conteudo">
+    {{ avisos() }}
+    {% block conteudo %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

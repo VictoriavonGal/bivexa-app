@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block titulo %}Bivexa AI{% endblock %}
+{% block conteudo %}
+<section class="hero-app">
+  <div class="stack">
+    <p class="label">Para o advogado autônomo e o escritório boutique</p>
+    <h1>Mais horas para <em>advogar.</em></h1>
+    <p class="muted" style="font-size:1.1rem;max-width:44ch">A Bivexa atende o cliente novo, marca a consulta, prepara proposta e contrato, cobra os honorários e acompanha o processo. Você só aprova: nada sai em seu nome sem o seu "sim".</p>
+    <div class="row">
+      <a class="btn btn-red" href="{{ url_for('cadastro') }}">Criar a conta do escritório</a>
+      <form method="post" action="{{ url_for('demonstracao') }}">{{ csrf_campo() }}<button class="btn">Entrar na demonstração</button></form>
+    </div>
+    <p class="small muted">A demonstração abre um escritório fictício, já configurado, com clientes de exemplo.</p>
+  </div>
+  <div class="card soft stack">
+    <span class="label">O que fica com a Bivexa</span>
+    <ul class="stack-s" style="margin:0;padding-left:1.1em">
+      <li>Primeiro atendimento, triagem e alerta de urgência</li>
+      <li>Conferência de conflito de interesses</li>
+      <li>Agenda de consultas, lembretes e prazos sugeridos</li>
+      <li>Proposta e contrato no modelo do escritório</li>
+      <li>Cobrança, lembrete de vencimento e aviso de atraso</li>
+      <li>Registro de conduta de tudo o que foi feito</li>
+    </ul>
+    <span class="label">O que continua com você</span>
+    <p>Ouvir o cliente, avaliar o caso, fixar honorários, assinar e decidir. É o que a lei reserva ao advogado (Lei 8.906/1994, art. 1º).</p>
+  </div>
+</section>
+<section class="grid-3">
+  <div class="card"><span class="label">1 · Configure</span><h3>Cinco minutos</h3><p class="muted">Horários, tabela de honorários e modelos de proposta e contrato. A Bivexa já traz sugestões editáveis.</p></div>
+  <div class="card"><span class="label">2 · Divulgue</span><h3>Um link de atendimento</h3><p class="muted">Seus clientes falam com a assistente do escritório, a qualquer hora. Ela nunca dá opinião jurídica.</p></div>
+  <div class="card destaque"><span class="label">3 · Aprove</span><h3>Uma fila de decisões</h3><p class="muted">Tudo o que sai em seu nome espera o seu "sim" numa única tela, com o registro de cada passo.</p></div>
+</section>
+{% endblock %}

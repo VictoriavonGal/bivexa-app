@@ -1,0 +1,31 @@
+{% extends "base_painel.html" %}
+{% block titulo %}Clientes · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <div class="stack-s"><span class="label">{{ total }} cliente(s)</span><h1>Clientes</h1></div>
+  <a class="btn btn-red" href="{{ url_for('painel.novo_cliente') }}">Cadastrar cliente</a>
+</div>
+<p class="muted">Do primeiro contato ao contrato assinado. Quem chegou pelo link de atendimento entra sozinho; quem chegou por telefone ou indicação você cadastra aqui.</p>
+<div class="funil">
+  {% for etapa, lista in colunas.items() %}
+  <div class="coluna">
+    <div class="row between"><span class="label">{{ etapa }}</span><span class="small muted">{{ lista | length }}</span></div>
+    {% for c in lista %}
+      <a class="mini {{ 'urgente' if c.urgente else '' }}" href="{{ url_for('painel.cliente', cliente_id=c.id) }}">
+        <strong>{{ c.nome }}</strong>
+        <span class="small muted">{{ c.area or 'Área a definir' }}{% if c.parte_contraria %} · contra {{ c.parte_contraria }}{% endif %}</span>
+        <span class="row">{% if c.urgente %}<span class="tag red">urgente</span>{% endif %}{% if c.conflito %}<span class="tag warn">conflito</span>{% endif %}</span>
+      </a>
+    {% else %}
+      <p class="small muted">Ninguém nesta etapa.</p>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% if outros %}
+<section class="stack-s">
+  <h2>Outros</h2>
+  {% for c in outros %}<a href="{{ url_for('painel.cliente', cliente_id=c.id) }}">{{ c.nome }}</a> <span class="small muted">({{ c.status }})</span>{% endfor %}
+</section>
+{% endif %}
+{% endblock %}

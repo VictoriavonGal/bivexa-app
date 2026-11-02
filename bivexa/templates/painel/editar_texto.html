@@ -1,0 +1,11 @@
+{% extends "base_painel.html" %}
+{% block titulo %}{{ titulo }} · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho"><div class="stack-s"><span class="label">Revisão do advogado</span><h1>{{ titulo }}</h1></div></div>
+<p class="muted">Edite o que quiser. Ao salvar, o texto volta para Aprovações e só sai depois do seu "sim".</p>
+<form method="post" class="stack">
+  {{ csrf_campo() }}
+  <textarea name="texto" class="{{ '' if curto else 'longo' }}" aria-label="Texto">{{ texto }}</textarea>
+  <div class="row"><a class="btn" href="{{ voltar }}">Cancelar</a><button class="btn btn-red">Salvar revisão</button></div>
+</form>
+{% endblock %}
