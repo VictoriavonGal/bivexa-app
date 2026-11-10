@@ -198,7 +198,7 @@ def test_um_escritorio_nao_ve_dados_do_outro(app):
 def test_todas_as_telas_abrem(app):
     adv, e = criar_escritorio(app)
     post(adv, "/painel/exemplos")
-    for url in ["/painel/", "/painel/aprovacoes", "/painel/clientes", "/painel/clientes/novo", "/painel/agenda",
+    for url in ["/painel/", "/painel/aprovacoes", "/painel/clientes", "/painel/captacao", "/painel/clientes/novo", "/painel/agenda",
                 "/painel/financeiro", "/painel/processos", "/painel/registro", "/painel/configuracoes",
                 "/painel/configuracoes/honorarios", "/painel/configuracoes/modelos", "/painel/configuracoes/conflitos",
                 f"/atendimento/{e['slug']}"]:
@@ -231,3 +231,35 @@ def test_administracao(app, monkeypatch):
         assert um("SELECT * FROM registro WHERE ator = 'Administração Bivexa'") is not None
     # Um advogado comum não acessa a administração
     assert adv.get("/admin/").status_code == 302
+
+
+def test_agenda_em_calendario_e_clientes(app):
+    adv, e = criar_escritorio(app)
+    post(adv, "/painel/exemplos")
+    for vista in ["mes", "semana", "dia"]:
+        html = adv.get(f"/painel/agenda?vista={vista}").get_data(as_text=True)
+        assert "Próximos compromissos" in html, vista
+    # Data inválida não quebra a tela
+    assert adv.get("/painel/agenda?vista=mes&data=xx").status_code == 200
+    # A busca encontra pelo nome da parte contrária, sem acento
+    html = adv.get("/painel/clientes?filtro=todos&q=claro").get_data(as_text=True)
+    assert "Fernando Lima" in html and "Mariana Costa" not in html
+    html = adv.get("/painel/captacao").get_data(as_text=True)
+    assert "Contrato para assinar" in html and "Marcar consulta" in html
+
+
+def test_aprovacao_mostra_a_mensagem(app):
+    adv, e = criar_escritorio(app)
+    post(adv, "/painel/exemplos")
+    adv.get("/painel/")
+    html = adv.get("/painel/aprovacoes").get_data(as_text=True)
+    assert "Mensagem que será enviada" in html
+    assert "ainda aparece em aberto" in html  # texto do aviso de atraso
+
+
+def test_vagas_nao_colidem_com_compromisso():
+    from datetime import date, datetime
+    vagas = regras.vagas_do_dia("", 60, [datetime(2026, 11, 12, 14, 30)], date(2026, 11, 12))
+    assert datetime(2026, 11, 12, 14, 0) not in vagas
+    assert datetime(2026, 11, 12, 15, 0) in vagas
+    assert regras.vagas_do_dia("", 60, [], date(2026, 11, 14)) == []  # sábado

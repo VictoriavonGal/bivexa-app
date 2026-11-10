@@ -20,7 +20,7 @@
 <section class="stack">
   <div class="row between"><h2>Precisa de você</h2><a class="small" href="{{ url_for('painel.aprovacoes') }}">Ver histórico de aprovações</a></div>
   {% for p in pendencias %}
-    {{ pendencia_card(p, rotulo_sim, rotulo_nao) }}
+    {{ pendencia_card(p, rotulo_sim, rotulo_nao, previas.get(p.id)) }}
   {% else %}
     <p class="vazio">Tudo em dia. Quando a Bivexa preparar algo que sai em seu nome, aparece aqui.</p>
   {% endfor %}

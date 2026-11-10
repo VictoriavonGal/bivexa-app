@@ -11,7 +11,7 @@
 <p class="muted" style="max-width:70ch">Proposta, contrato, primeira cobrança, datas de processo e avisos ao cliente esperam aqui. Confirmação de horário e lembretes de vencimento saem sozinhos, sempre conferidos contra opinião jurídica.</p>
 <section class="stack">
   {% for p in pendencias %}
-    {{ pendencia_card(p, rotulo_sim, rotulo_nao) }}
+    {{ pendencia_card(p, rotulo_sim, rotulo_nao, previas.get(p.id)) }}
   {% else %}
     <p class="vazio">Nenhuma decisão pendente.</p>
   {% endfor %}

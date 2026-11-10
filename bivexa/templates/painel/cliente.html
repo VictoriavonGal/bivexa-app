@@ -26,7 +26,8 @@
     <p>{{ c.resumo or 'Sem resumo.' }}</p>
     {% if c.motivo_urgencia %}<p class="small"><strong>Urgência:</strong> {{ c.motivo_urgencia }}</p>{% endif %}
     <span class="label">Documentos a pedir</span>
-    <p class="small">{{ c.documentos_pendentes or '—' }}</p>
+    {% set docs = (c.documentos_pendentes or '').replace(' e ', '; ').split(';') | map('trim') | select | list %}
+    {% if docs %}<ul class="lista-docs">{% for d in docs %}<li>{{ d[:1] | upper }}{{ d[1:] }}</li>{% endfor %}</ul>{% else %}<p class="small">—</p>{% endif %}
   </div>
   <div class="card">
     <table>
@@ -50,7 +51,7 @@
     <h2>Agenda</h2>
     {% for k in compromissos %}
       <div class="card"><div class="row"><span class="tag">{{ k.tipo }}</span><strong>{{ k.inicio | extenso }}</strong></div><p class="small muted">{{ k.titulo }}</p></div>
-    {% else %}<p class="vazio">Nenhum compromisso.</p>{% endfor %}
+    {% else %}<div class="vazio stack-s"><span>Consulta a marcar.</span><a class="btn btn-s" href="{{ url_for('painel.agenda', cliente=c.id) }}">Marcar consulta</a></div>{% endfor %}
   </div>
   <div class="stack">
     <h2>Proposta e contrato</h2>
@@ -97,12 +98,12 @@
     <h2>Conversa</h2>
     <div class="chat-caixa conversa-painel">
       {% for m in mensagens %}
-        <div class="msg {{ m.autor }}">{{ m.texto | linkar }}<small>{{ 'Cliente' if m.autor == 'cliente' else 'Bivexa' }} · {{ m.criado_em | data }}</small></div>
+        <div class="msg {{ m.autor }}">{{ m.texto | linkar }}<small>{{ {'cliente': 'Cliente', 'advogado': escritorio.advogado_nome}.get(m.autor, 'Bivexa') }} · {{ m.criado_em | data }}</small></div>
       {% else %}<p class="small muted">Sem mensagens.</p>{% endfor %}
     </div>
   </div>
   <div class="stack">
-    <h2>Registro de conduta</h2>
+    <h2>Histórico de ações</h2>
     <div class="linha-tempo">
       {% for r in registros %}
         <div class="evento"><time>{{ r.criado_em | data }}</time><div><strong>{{ r.acao }}</strong> <span class="small muted">· {{ r.ator }}</span>{% if r.detalhe %}<p class="small muted">{{ r.detalhe }}</p>{% endif %}{% if r.verificacoes %}<p class="verif">✓ {{ r.verificacoes }}</p>{% endif %}</div></div>

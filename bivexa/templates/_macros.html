@@ -25,7 +25,7 @@
 <span class="tag {{ cores.get(status, '') }}">{{ status }}</span>
 {%- endmacro %}
 
-{% macro pendencia_card(p, rotulo_sim, rotulo_nao) -%}
+{% macro pendencia_card(p, rotulo_sim, rotulo_nao, previa=None) -%}
 <article class="card {{ 'urgente' if p.urgente else '' }}">
   <div class="pendencia">
     <div class="stack-s">
@@ -35,6 +35,13 @@
       </div>
       <h3>{{ p.titulo }}{% if p.cliente_nome %} · {{ p.cliente_nome }}{% endif %}</h3>
       <p class="muted">{{ p.descricao }}</p>
+      {% if previa %}
+      <div class="previa">
+        <span class="label">Mensagem que será enviada{% if p.cliente_nome %} a {{ p.cliente_nome }}{% endif %}</span>
+        <p class="msg-previa">{{ previa.mensagem | linkar }}</p>
+        {% if previa.documento %}<details><summary class="small">Ler o documento completo</summary><div class="documento small">{{ previa.documento }}</div></details>{% endif %}
+      </div>
+      {% endif %}
       {% if p.cliente_id %}<a class="small" href="{{ url_for('painel.cliente', cliente_id=p.cliente_id) }}">Abrir a ficha do cliente</a>{% endif %}
     </div>
     <div class="acoes">
@@ -73,12 +80,16 @@
         {% for m in [30, 45, 60, 90] %}<option value="{{ m }}" {% if e.duracao_consulta == m %}selected{% endif %}>{{ m }} minutos</option>{% endfor %}
       </select>
     </label>
-    <label class="campo">Lembrar o cliente do vencimento
+    <label class="campo">Lembrar o cliente do vencimento da parcela
       <select name="lembrete_dias">
         {% for d in [1, 2, 3, 5, 7] %}<option value="{{ d }}" {% if e.lembrete_dias == d %}selected{% endif %}>{{ d }} dia(s) antes</option>{% endfor %}
       </select>
     </label>
   </div>
-  <label class="check"><input type="checkbox" name="video" {% if e.consulta_por_video %}checked{% endif %}> Também atendo por vídeo</label>
+  <label class="campo">Formato da consulta
+    <select name="formato">
+      {% for valor, nome in [(0, 'Só presencial'), (1, 'Presencial e online'), (2, 'Só online')] %}<option value="{{ valor }}" {% if e.consulta_por_video == valor %}selected{% endif %}>{{ nome }}</option>{% endfor %}
+    </select>
+  </label>
 </fieldset>
 {%- endmacro %}

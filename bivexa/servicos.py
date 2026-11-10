@@ -173,17 +173,12 @@ def aprovar(escritorio, pendencia):
         proposta = um("SELECT * FROM proposta WHERE id = ?", pendencia["ref_id"])
         executar("UPDATE proposta SET status = 'enviada' WHERE id = ?", proposta["id"])
         executar("UPDATE cliente SET status = 'proposta enviada' WHERE id = ?", cliente["id"])
-        enviar_mensagem(cliente, f"Olá, {primeiro_nome(cliente)}. Conforme conversado na consulta, segue a "
-                                 f"proposta de honorários do escritório {escritorio['nome']}. Você pode lê-la e aceitá-la pelo "
-                                 f"link: /proposta/{proposta['token']}",
-                        acao="Proposta enviada ao cliente")
+        enviar_mensagem(cliente, texto_proposta(escritorio, cliente, proposta), acao="Proposta enviada ao cliente")
 
     elif tipo == "contrato":
         contrato = um("SELECT * FROM contrato WHERE id = ?", pendencia["ref_id"])
         executar("UPDATE contrato SET status = 'enviado para assinatura' WHERE id = ?", contrato["id"])
-        enviar_mensagem(cliente, f"Olá, {primeiro_nome(cliente)}. O contrato de honorários está pronto para "
-                                 f"a sua assinatura eletrônica: /contrato/{contrato['token']}",
-                        acao="Contrato enviado para assinatura")
+        enviar_mensagem(cliente, texto_contrato(cliente, contrato), acao="Contrato enviado para assinatura")
 
     elif tipo == "cobranca":
         parcela = um("SELECT * FROM parcela WHERE id = ?", pendencia["ref_id"])
@@ -209,11 +204,7 @@ def aprovar(escritorio, pendencia):
 
     elif tipo == "atraso":
         parcela = um("SELECT * FROM parcela WHERE id = ?", pendencia["ref_id"])
-        enviar_mensagem(cliente, f"Olá, {primeiro_nome(cliente)}. Consta em aberto a parcela "
-                                 f"{parcela['numero']}/{parcela['total_parcelas']} de {regras.moeda(parcela['valor'])}, "
-                                 f"vencida em {regras.data_br(parcela['vencimento'])}. Segue o link para "
-                                 f"pagamento: /pagamento/{parcela['token']}",
-                        acao="Aviso de parcela em atraso enviado")
+        enviar_mensagem(cliente, texto_atraso(escritorio, cliente, parcela), acao="Aviso de parcela em atraso enviado")
 
     elif tipo == "mensagem_bloqueada":
         registrar(eid, "Advogado(a)", "Bloqueio de mensagem conferido", pendencia["descricao"], pendencia["cliente_id"])
@@ -238,6 +229,65 @@ def recusar(escritorio, pendencia):
     else:
         registrar(eid, "Advogado(a)", "Pendência dispensada", pendencia["titulo"], pendencia["cliente_id"])
     resolver_pendencia(pendencia["id"], "recusada")
+
+
+# ---------------------------------------------------------------- textos ao cliente
+# Ficam juntos para que a tela de Aprovações mostre EXATAMENTE o que vai sair.
+
+def texto_proposta(escritorio, cliente, proposta):
+    return (f"Olá, {primeiro_nome(cliente)}. Conforme conversado na consulta, segue a proposta de honorários do "
+            f"escritório {escritorio['nome']}. Leia com calma; se tiver dúvidas, é só responder aqui que eu "
+            f"repasso. Para aceitar, use o link: /proposta/{proposta['token']}")
+
+
+def texto_contrato(cliente, contrato):
+    return (f"Olá, {primeiro_nome(cliente)}. Obrigada por aceitar a proposta. O contrato de honorários está "
+            f"pronto para a sua assinatura eletrônica: /contrato/{contrato['token']}")
+
+
+def texto_cobranca(cliente, parcela):
+    return (f"Olá, {primeiro_nome(cliente)}. Segue a cobrança da parcela {parcela['numero']}/{parcela['total_parcelas']} "
+            f"dos honorários, de {regras.moeda(parcela['valor'])}, com vencimento em "
+            f"{regras.data_br(parcela['vencimento'])}. Pode pagar por Pix ou boleto: /pagamento/{parcela['token']}")
+
+
+def texto_atraso(escritorio, cliente, parcela):
+    """Aviso cordial: o cliente é do advogado e a relação continua depois da cobrança."""
+    return (f"Olá, {primeiro_nome(cliente)}, tudo bem? Aqui é a assistente do escritório {escritorio['nome']}. "
+            f"Notamos que a parcela {parcela['numero']}/{parcela['total_parcelas']} dos honorários "
+            f"({regras.moeda(parcela['valor'])}), com vencimento em {regras.data_br(parcela['vencimento'])}, ainda "
+            f"aparece em aberto. Se já pagou, pode desconsiderar. Se precisar combinar outra data, é só responder "
+            f"aqui que eu aviso o escritório. Link para pagamento: /pagamento/{parcela['token']}")
+
+
+def previa(escritorio, pendencia):
+    """O que sai para o cliente se o advogado aprovar: (mensagem, documento).
+
+    Mostrar o texto exato antes do "sim" é o que torna a aprovação de verdade.
+    """
+    tipo, ref = pendencia["tipo"], pendencia["ref_id"]
+    cliente = um("SELECT * FROM cliente WHERE id = ?", pendencia["cliente_id"]) if pendencia["cliente_id"] else None
+    if cliente is None:
+        return None
+    if tipo == "proposta":
+        p = um("SELECT * FROM proposta WHERE id = ?", ref)
+        return {"mensagem": texto_proposta(escritorio, cliente, p), "documento": p["texto"]} if p else None
+    if tipo == "contrato":
+        k = um("SELECT * FROM contrato WHERE id = ?", ref)
+        return {"mensagem": texto_contrato(cliente, k), "documento": k["texto"]} if k else None
+    if tipo == "cobranca":
+        p = um("SELECT * FROM parcela WHERE id = ?", ref)
+        return {"mensagem": texto_cobranca(cliente, p), "documento": None} if p else None
+    if tipo == "atraso":
+        p = um("SELECT * FROM parcela WHERE id = ?", ref)
+        return {"mensagem": texto_atraso(escritorio, cliente, p), "documento": None} if p else None
+    if tipo == "mensagem":
+        a = um("SELECT * FROM andamento WHERE id = ?", ref)
+        return {"mensagem": a["mensagem_cliente"], "documento": None} if a else None
+    if tipo == "conflito":
+        return {"mensagem": "Obrigada pela espera. O escritório pode atender o seu caso. Por qual telefone ou "
+                            "e-mail podemos falar com você?", "documento": None}
+    return None
 
 
 def primeiro_nome(cliente):
@@ -342,7 +392,8 @@ def processar_mensagem(escritorio, cliente, texto):
         if cliente["urgente"]:
             resposta = f"Como o seu caso tem urgência, o escritório já foi avisado e pode falar com você antes. "
         lista = "; ".join(f"{i + 1}) {regras.data_extenso(o)}" for i, o in enumerate(opcoes))
-        modo = " Pode ser por vídeo ou no escritório." if escritorio["consulta_por_video"] else ""
+        modo = {1: " Pode ser online ou no escritório.", 2: " A consulta é online, por vídeo."}.get(
+            escritorio["consulta_por_video"], " A consulta é no escritório.")
         resposta += f"Para a consulta, há estes horários: {lista}. Responda com o número da opção.{modo}"
         enviar_mensagem(cliente, resposta, acao="Horários de consulta oferecidos")
         return
@@ -478,11 +529,7 @@ def emitir_parcela(escritorio, parcela, aprovada_pelo_advogado=False):
     executar("UPDATE parcela SET status = 'emitida', codigo_pagamento = ? WHERE id = ?",
              codigo_pagamento(parcela), parcela["id"])
     origem = "aprovada pelo advogado" if aprovada_pelo_advogado else "emissão automática programada"
-    enviar_mensagem(cliente, f"Olá, {primeiro_nome(cliente)}. Segue a cobrança da parcela "
-                             f"{parcela['numero']}/{parcela['total_parcelas']} dos honorários, de "
-                             f"{regras.moeda(parcela['valor'])}, com vencimento em "
-                             f"{regras.data_br(parcela['vencimento'])}: /pagamento/{parcela['token']}",
-                    acao=f"Cobrança enviada ({origem})")
+    enviar_mensagem(cliente, texto_cobranca(cliente, parcela), acao=f"Cobrança enviada ({origem})")
 
 
 def pagar_parcela(parcela):
@@ -569,7 +616,7 @@ def registrar_publicacao(escritorio, processo, texto):
                         f"{regras.data_br(leitura['data'])}. {leitura['explicacao']}",
                         cliente["id"], urgente=(leitura["tipo"] == "prazo"))
     criar_pendencia(escritorio["id"], "mensagem", andamento_id, "Aviso ao cliente pronto",
-                    f"Rascunho para {cliente['nome']}: \"{leitura['mensagem']}\"", cliente["id"])
+                    f"Rascunho de aviso sobre a nova publicação do processo {processo['numero']}.", cliente["id"])
     return andamento_id
 
 
@@ -586,42 +633,6 @@ def preparar_escritorio_novo(escritorio_id):
 
 
 def carregar_exemplos(escritorio):
-    """Cria clientes e processos de exemplo, marcados como EXEMPLO, para demonstração."""
-    eid = escritorio["id"]
-    agora = regras.agora_iso()
-    executar("INSERT INTO parte (escritorio_id, nome, papel, observacao) VALUES (?, ?, 'cliente', 'EXEMPLO')",
-             eid, "Transportes Ipê")
-
-    def novo_cliente(nome, contato, contraria, area, relato, status, urgente=0, motivo=""):
-        cid = executar(
-            "INSERT INTO cliente (escritorio_id, nome, contato, parte_contraria, area, relato, resumo,"
-            " documentos_pendentes, status, urgente, motivo_urgencia, etapa_conversa, origem, token, criado_em)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'agendado', 'exemplo', ?, ?)",
-            eid, nome, contato, contraria, area, relato,
-            regras.resumo_simples(relato, area, urgente, motivo), regras.documentos_sugeridos(area),
-            status, urgente, motivo, regras.novo_token(), agora,
-        )
-        executar("INSERT INTO mensagem (cliente_id, autor, texto, criado_em) VALUES (?, 'cliente', ?, ?)", cid, relato, agora)
-        return cid
-
-    mariana = novo_cliente("Mariana Costa (EXEMPLO)", "(11) 90000-0001", "Rodrigo Costa", "Família",
-                           "Quero entrar com pedido de pensão alimentícia para minha filha de 6 anos.", "consulta marcada")
-    amanha = regras.hoje() + timedelta(days=1)
-    executar("INSERT INTO compromisso (escritorio_id, cliente_id, tipo, titulo, inicio, confirmado, observacao)"
-             " VALUES (?, ?, 'consulta', ?, ?, 1, 'EXEMPLO')",
-             eid, mariana, "Consulta – Mariana Costa (EXEMPLO)", f"{amanha.isoformat()} 10:00:00")
-    registrar(eid, "Bivexa", "Consulta marcada", regras.data_extenso(f"{amanha.isoformat()} 10:00:00"), mariana)
-
-    carlos = novo_cliente("Carlos Souza (EXEMPLO)", "carlos@exemplo.com", "Companhia Aérea Exemplo", "Consumidor",
-                          "Meu voo foi cancelado e perdi a conexão. A companhia não me reembolsou.", "contratado")
-    executar("INSERT INTO parte (escritorio_id, nome, papel, observacao) VALUES (?, ?, 'cliente', 'EXEMPLO')",
-             eid, "Carlos Souza (EXEMPLO)")
-    pid = executar("INSERT INTO processo (escritorio_id, cliente_id, numero, tribunal, descricao, criado_em)"
-                   " VALUES (?, ?, ?, ?, ?, ?)", eid, carlos, "1004321-55.2026.8.26.0002", "TJSP – Juizado Especial Cível",
-                   "Indenização por cancelamento de voo (EXEMPLO)", agora)
-    vencida = (regras.hoje() - timedelta(days=4)).isoformat()
-    for n, (venc, status) in enumerate([(vencida, "emitida"), ((regras.hoje() + timedelta(days=26)).isoformat(), "programada")], 1):
-        executar("INSERT INTO parcela (escritorio_id, cliente_id, numero, total_parcelas, valor, vencimento, status,"
-                 " codigo_pagamento, token) VALUES (?, ?, ?, 2, 1250, ?, ?, ?, ?)",
-                 eid, carlos, n, venc, status, "DEMO-PIX-EXEMPLO", regras.novo_token())
-    return pid
+    """Cria o escritório de demonstração (veja exemplos.py)."""
+    from . import exemplos  # importado aqui para evitar importação circular
+    return exemplos.carregar(escritorio)

@@ -4,31 +4,35 @@
 <section class="hero-app">
   <div class="stack">
     <p class="label">Para o advogado autônomo e o escritório boutique</p>
-    <h1>Mais horas para <em>advogar.</em></h1>
-    <p class="muted" style="font-size:1.1rem;max-width:44ch">A Bivexa atende o cliente novo, marca a consulta, prepara proposta e contrato, cobra os honorários e acompanha o processo. Você só aprova: nada sai em seu nome sem o seu "sim".</p>
+    <h1>A secretária que o seu escritório <em>ainda não pode contratar.</em></h1>
+    <p class="muted" style="font-size:1.1rem;max-width:48ch">Você advoga, atende, agenda, cobra e acompanha processo sozinho. A Bivexa assume a parte administrativa: recebe o cliente novo, marca a consulta, prepara proposta e contrato, lembra vencimentos e avisa das publicações. Tudo o que sai em seu nome passa antes pelo seu "sim".</p>
     <div class="row">
       <a class="btn btn-red" href="{{ url_for('cadastro') }}">Criar a conta do escritório</a>
-      <form method="post" action="{{ url_for('demonstracao') }}">{{ csrf_campo() }}<button class="btn">Entrar na demonstração</button></form>
+      <form method="post" action="{{ url_for('demonstracao') }}">{{ csrf_campo() }}<button class="btn">Ver a demonstração</button></form>
     </div>
-    <p class="small muted">A demonstração abre um escritório fictício, já configurado, com clientes de exemplo.</p>
+    <p class="small muted">A demonstração abre um escritório fictício, já em funcionamento.</p>
   </div>
   <div class="card soft stack">
-    <span class="label">O que fica com a Bivexa</span>
+    <span class="label">O que a Bivexa faz por você</span>
     <ul class="stack-s" style="margin:0;padding-left:1.1em">
-      <li>Primeiro atendimento, triagem e alerta de urgência</li>
-      <li>Conferência de conflito de interesses</li>
-      <li>Agenda de consultas, lembretes e prazos sugeridos</li>
-      <li>Proposta e contrato no modelo do escritório</li>
-      <li>Cobrança, lembrete de vencimento e aviso de atraso</li>
-      <li>Registro de conduta de tudo o que foi feito</li>
+      <li>Responde o primeiro contato a qualquer hora e organiza o relato</li>
+      <li>Marca a consulta na sua agenda e confirma com o cliente na véspera</li>
+      <li>Prepara proposta e contrato no modelo do escritório</li>
+      <li>Envia cobranças, lembra vencimentos e avisa atrasos com cordialidade</li>
+      <li>Lê as publicações dos seus processos e sugere a data na agenda</li>
+      <li>Guarda um histórico de tudo o que fez em seu nome</li>
     </ul>
     <span class="label">O que continua com você</span>
-    <p>Ouvir o cliente, avaliar o caso, fixar honorários, assinar e decidir. É o que a lei reserva ao advogado (Lei 8.906/1994, art. 1º).</p>
+    <p>Ouvir o cliente, avaliar o caso, definir a estratégia e o preço. A Bivexa cuida do caminho até a consulta; a conversa sobre o caso é sempre entre o cliente e você.</p>
   </div>
 </section>
 <section class="grid-3">
-  <div class="card"><span class="label">1 · Configure</span><h3>Cinco minutos</h3><p class="muted">Horários, tabela de honorários e modelos de proposta e contrato. A Bivexa já traz sugestões editáveis.</p></div>
-  <div class="card"><span class="label">2 · Divulgue</span><h3>Um link de atendimento</h3><p class="muted">Seus clientes falam com a assistente do escritório, a qualquer hora. Ela nunca dá opinião jurídica.</p></div>
-  <div class="card destaque"><span class="label">3 · Aprove</span><h3>Uma fila de decisões</h3><p class="muted">Tudo o que sai em seu nome espera o seu "sim" numa única tela, com o registro de cada passo.</p></div>
+  <div class="card"><span class="label">1 · Configure</span><h3>Em poucos minutos</h3><p class="muted">Horários, áreas em que atua, tabela de honorários e modelos de proposta e contrato. A Bivexa já traz sugestões editáveis.</p></div>
+  <div class="card"><span class="label">2 · Divulgue</span><h3>Um link de atendimento</h3><p class="muted">O cliente fala com a assistente do escritório, conta o caso e escolhe um horário. Perguntas sobre o caso ficam para a consulta com você.</p></div>
+  <div class="card destaque"><span class="label">3 · Aprove</span><h3>Uma fila de decisões</h3><p class="muted">Proposta, contrato, cobrança e avisos esperam numa única tela, com o texto exato que vai sair. Um clique e está enviado.</p></div>
+</section>
+<section class="card">
+  <span class="label">IA e regras fixas</span>
+  <p class="muted" style="max-width:80ch">A inteligência artificial resume o relato do cliente, redige o objeto da proposta e lê as publicações. Agendamento, cobrança, prazos e a verificação de que nenhuma mensagem contém opinião jurídica seguem regras fixas e previsíveis. Se a IA estiver desligada, tudo continua funcionando só com as regras. <a href="{{ url_for('privacidade') }}">Como tratamos os dados</a>.</p>
 </section>
 {% endblock %}

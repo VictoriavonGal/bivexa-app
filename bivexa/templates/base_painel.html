@@ -11,9 +11,9 @@
     </div>
     <nav aria-label="Painel">
       {% set itens = [
-        ('painel.hoje', 'Hoje'), ('painel.aprovacoes', 'Aprovações'), ('painel.clientes', 'Clientes'),
+        ('painel.hoje', 'Hoje'), ('painel.aprovacoes', 'Aprovações'), ('painel.captacao', 'Captação'), ('painel.clientes', 'Clientes'),
         ('painel.agenda', 'Agenda'), ('painel.financeiro', 'Financeiro'), ('painel.processos', 'Processos'),
-        ('painel.registro', 'Registro de conduta'), ('painel.configuracoes', 'Configurações')] %}
+        ('painel.registro', 'Histórico de ações'), ('painel.configuracoes', 'Configurações')] %}
       {% for ep, nome in itens %}
       <a href="{{ url_for(ep) }}" class="{{ 'ativo' if request.endpoint == ep or (ep == 'painel.configuracoes' and request.endpoint in ['painel.honorarios','painel.modelos','painel.conflitos']) or (ep == 'painel.clientes' and request.endpoint in ['painel.cliente','painel.novo_cliente','painel.nova_proposta']) or (ep == 'painel.processos' and request.endpoint == 'painel.processo') }}">
         <span>{{ nome }}</span>

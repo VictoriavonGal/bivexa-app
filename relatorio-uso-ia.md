@@ -23,6 +23,7 @@ Na fase 1, a Bivexa era uma proposta: um site que prometia cuidar da parte não 
 - **A urgência do nosso próprio exemplo não era detectada.** O teste automático mostrou que a frase do site, "a empresa quer que eu assine um acordo amanhã", passava sem alerta: a regra só reconhecia "assine amanhã" com as palavras lado a lado. Trocamos a regra para combinar uma palavra de tempo curto (amanhã, hoje) com uma palavra de ato (assinar, acordo, audiência, prazo). Lição: o teste com o exemplo do pitch pegou o erro antes da banca.
 - **"Do escritório de Dra. Helena Silva".** As mensagens ao cliente usavam o nome do advogado e ficavam erradas em português, porque o app não sabe se é "o Dr." ou "a Dra.". Reescrevemos para usar o nome do escritório.
 - **Texto da IA com opinião jurídica.** Previmos o caso: se o modelo escrever algo como "você vai ganhar", o texto é descartado e o app usa o modelo fixo. Há um teste automático para isso.
+- **Consulta marcada num sábado.** Ao refazer a demonstração com datas relativas a hoje (feedback do professor), a conversa dizia "quinta às 14h" e a agenda mostrava a consulta num sábado. Corrigimos fazendo os exemplos caírem sempre em dia útil e gerando o dia da semana da conversa a partir da data real. Um teste roda a demonstração em sete "hojes" diferentes.
 - [grupo: incluam aqui o que der errado quando vocês mesmos testarem e publicarem.]
 
 ## 4. Custo e limite

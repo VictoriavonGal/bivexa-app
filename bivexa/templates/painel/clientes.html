@@ -2,30 +2,52 @@
 {% block titulo %}Clientes · Bivexa AI{% endblock %}
 {% block conteudo %}
 <div class="cabecalho">
-  <div class="stack-s"><span class="label">{{ total }} cliente(s)</span><h1>Clientes</h1></div>
+  <div class="stack-s"><span class="label">{{ contagem['ativos'] }} contratado(s) · {{ contagem['captacao'] }} em captação</span><h1>Clientes</h1></div>
   <a class="btn btn-red" href="{{ url_for('painel.novo_cliente') }}">Cadastrar cliente</a>
 </div>
-<p class="muted">Do primeiro contato ao contrato assinado. Quem chegou pelo link de atendimento entra sozinho; quem chegou por telefone ou indicação você cadastra aqui.</p>
-<div class="funil">
-  {% for etapa, lista in colunas.items() %}
-  <div class="coluna">
-    <div class="row between"><span class="label">{{ etapa }}</span><span class="small muted">{{ lista | length }}</span></div>
-    {% for c in lista %}
-      <a class="mini {{ 'urgente' if c.urgente else '' }}" href="{{ url_for('painel.cliente', cliente_id=c.id) }}">
-        <strong>{{ c.nome }}</strong>
-        <span class="small muted">{{ c.area or 'Área a definir' }}{% if c.parte_contraria %} · contra {{ c.parte_contraria }}{% endif %}</span>
-        <span class="row">{% if c.urgente %}<span class="tag red">urgente</span>{% endif %}{% if c.conflito %}<span class="tag warn">conflito</span>{% endif %}</span>
-      </a>
-    {% else %}
-      <p class="small muted">Ninguém nesta etapa.</p>
+
+<form class="filtros" method="get" role="search">
+  <nav class="segmentos" aria-label="Filtrar clientes">
+    {% for chave, (nome, _) in filtros.items() %}
+    <a href="{{ url_for('painel.clientes', filtro=chave, q=busca or None) }}" class="{{ 'ativo' if filtro == chave else '' }}">{{ nome }} <span class="muted">{{ contagem[chave] }}</span></a>
     {% endfor %}
-  </div>
-  {% endfor %}
+  </nav>
+  <input type="hidden" name="filtro" value="{{ filtro }}">
+  <input class="busca" type="search" name="q" value="{{ busca }}" placeholder="Buscar por nome, área, parte contrária ou contato" aria-label="Buscar cliente">
+</form>
+
+{% if lista %}
+<div class="tabela-wrap">
+  <table class="tabela-clientes">
+    <thead><tr><th>Cliente</th><th>Área e caso</th><th>Etapa</th><th>Próximo compromisso</th><th>Honorários</th><th>Contato</th></tr></thead>
+    <tbody>
+    {% for c in lista %}
+      <tr class="{{ 'linha-urgente' if c.urgente else '' }}">
+        <td>
+          <a class="nome-cliente" href="{{ url_for('painel.cliente', cliente_id=c.id) }}">{{ c.nome }}</a>
+          <div class="row" style="gap:4px;margin-top:4px">
+            {% if c.urgente %}<span class="tag red">urgente</span>{% endif %}
+            {% if c.conflito %}<span class="tag warn">conflito</span>{% endif %}
+            {% if c.n_processos %}<span class="tag">{{ c.n_processos }} processo{{ 's' if c.n_processos > 1 }}</span>{% endif %}
+          </div>
+        </td>
+        <td><strong class="small">{{ c.area or 'Área a definir' }}</strong>{% if c.parte_contraria %}<div class="small muted">contra {{ c.parte_contraria }}</div>{% endif %}</td>
+        <td><span class="etapa etapa-{{ c.status | replace(' ', '-') }}">{{ 'contrato para assinar' if c.status == 'proposta aceita' else c.status }}</span></td>
+        <td class="small">{% if c.proximo and c.proximo[11:16] == '23:59' %}{{ c.proximo[:10] | extenso }} <span class="tag red">prazo</span>{% elif c.proximo %}{{ c.proximo | extenso }}{% elif c.status == 'novo contato' %}<a href="{{ url_for('painel.agenda', cliente=c.id) }}">marcar consulta</a>{% else %}<span class="muted">nada agendado</span>{% endif %}</td>
+        <td class="small n">
+          {% if c.contratado_total %}
+            {{ c.pago | moeda }} <span class="muted">de {{ c.contratado_total | moeda }}</span>
+            {% if c.atrasado %}<div><span class="tag red">{{ c.atrasado | moeda }} em atraso</span></div>{% endif %}
+          {% else %}<span class="muted">—</span>{% endif %}
+        </td>
+        <td class="small muted">{{ c.contato or '—' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 </div>
-{% if outros %}
-<section class="stack-s">
-  <h2>Outros</h2>
-  {% for c in outros %}<a href="{{ url_for('painel.cliente', cliente_id=c.id) }}">{{ c.nome }}</a> <span class="small muted">({{ c.status }})</span>{% endfor %}
-</section>
+{% else %}
+  <p class="vazio">{% if busca %}Nenhum cliente encontrado para "{{ busca }}".{% else %}Nenhum cliente nesta lista ainda.{% endif %}</p>
 {% endif %}
+<p class="small muted">Quem ainda está entre o primeiro contato e a assinatura aparece também em <a href="{{ url_for('painel.captacao') }}">Captação</a>, com o próximo passo de cada um.</p>
 {% endblock %}

@@ -307,30 +307,39 @@ def horarios_livres(horarios_json, duracao_min, ocupados, quantidade=3, a_partir
     ocupados: lista de datetimes já marcados.
     Começa no dia seguinte, para dar tempo de o advogado ler a ficha.
     """
-    h = ler_horarios(horarios_json)
-    inicio_dia = time.fromisoformat(h["inicio"])
-    fim_dia = time.fromisoformat(h["fim"])
-    almoco_ini = time.fromisoformat(h["almoco_inicio"]) if h.get("almoco_inicio") else None
-    almoco_fim = time.fromisoformat(h["almoco_fim"]) if h.get("almoco_fim") else None
-    passo = timedelta(minutes=duracao_min or 60)
-    ocupados = {o.replace(tzinfo=None) for o in ocupados}
-
     base = (a_partir or agora()).date()
     livres = []
     for d in range(1, 21):
-        dia = base + timedelta(days=d)
-        if dia.weekday() not in h["dias"]:
-            continue
-        atual = datetime.combine(dia, inicio_dia)
-        fim = datetime.combine(dia, fim_dia)
-        while atual + passo <= fim:
-            no_almoco = almoco_ini and almoco_fim and almoco_ini <= atual.time() < almoco_fim
-            if not no_almoco and atual not in ocupados:
-                livres.append(atual)
-                if len(livres) >= quantidade:
-                    return livres
-            atual += passo
+        for vaga in vagas_do_dia(horarios_json, duracao_min, ocupados, base + timedelta(days=d)):
+            livres.append(vaga)
+            if len(livres) >= quantidade:
+                return livres
     return livres
+
+
+def vagas_do_dia(horarios_json, duracao_min, ocupados, dia):
+    """Todos os horários de consulta livres de um dia, dentro do expediente.
+
+    Um horário está ocupado se algum compromisso começa durante ele (e não
+    só exatamente no início), para não marcar consulta em cima de audiência.
+    """
+    h = ler_horarios(horarios_json)
+    if dia.weekday() not in h["dias"]:
+        return []
+    almoco_ini = time.fromisoformat(h["almoco_inicio"]) if h.get("almoco_inicio") else None
+    almoco_fim = time.fromisoformat(h["almoco_fim"]) if h.get("almoco_fim") else None
+    passo = timedelta(minutes=duracao_min or 60)
+    ocupados = [o.replace(tzinfo=None) for o in ocupados]
+    atual = datetime.combine(dia, time.fromisoformat(h["inicio"]))
+    fim = datetime.combine(dia, time.fromisoformat(h["fim"]))
+    vagas = []
+    while atual + passo <= fim:
+        no_almoco = almoco_ini and almoco_fim and almoco_ini <= atual.time() < almoco_fim
+        tomado = any(atual <= o < atual + passo for o in ocupados)
+        if not no_almoco and not tomado:
+            vagas.append(atual)
+        atual += passo
+    return vagas
 
 
 def descrever_horarios(horarios_json):

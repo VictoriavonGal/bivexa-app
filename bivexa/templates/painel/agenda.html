@@ -1,39 +1,167 @@
 {% extends "base_painel.html" %}
 {% block titulo %}Agenda · Bivexa AI{% endblock %}
+
+{# Duração aproximada de cada tipo de compromisso, só para desenhar o bloco na grade #}
+{% macro minutos_de(k) -%}{{ duracao if k.tipo == 'consulta' else (90 if k.tipo == 'audiência' else 60) }}{%- endmacro %}
+{% macro eh_dia_todo(k) -%}{{ 'sim' if k.tipo == 'prazo' or k.inicio[11:16] in ['', '23:59'] else '' }}{%- endmacro %}
+
+{% macro bloco(k) -%}
+{% set classes_tipo = {'consulta': 'consulta', 'audiência': 'audiencia', 'reunião': 'reuniao', 'prazo': 'prazo'} %}
+{% set rotulo = k.inicio[11:16] ~ ' · ' ~ k.titulo %}
+{% if k.cliente_id %}<a class="evento-cal tipo-{{ classes_tipo.get(k.tipo, 'outro') }} {{ '' if k.confirmado else 'a-confirmar' }}" href="{{ url_for('painel.cliente', cliente_id=k.cliente_id) }}" title="{{ rotulo }}">
+{% else %}<div class="evento-cal tipo-{{ classes_tipo.get(k.tipo, 'outro') }} {{ '' if k.confirmado else 'a-confirmar' }}" title="{{ rotulo }}">{% endif %}
+  <span class="ev-hora">{{ k.inicio[11:16] }}{% if not k.confirmado %}<span class="ev-conf"> · a confirmar</span>{% endif %}</span>
+  <span class="ev-titulo">{{ k.cliente_nome if k.cliente_nome and k.tipo in ['consulta', 'reunião'] else k.titulo }}</span>
+{% if k.cliente_id %}</a>{% else %}</div>{% endif %}
+{%- endmacro %}
+
 {% block conteudo %}
-<div class="cabecalho"><div class="stack-s"><span class="label">Atendimento: {{ horarios }}</span><h1>Agenda</h1></div></div>
-<section class="grid-2">
-  <div class="stack">
-    {% for dia, itens in dias.items() %}
-      <div class="stack-s">
-        <span class="label">{{ dia | extenso }}</span>
-        {% for k in itens %}
-          <div class="card {{ 'urgente' if k.tipo == 'prazo' else '' }}">
-            <div class="row between"><div class="row"><span class="tag {{ 'red' if k.tipo == 'prazo' else '' }}">{{ k.tipo }}</span><strong>{{ k.inicio[11:16] if k.tipo != 'prazo' else 'até o fim do dia' }}</strong></div>
-            {% if k.cliente_id %}<a class="small" href="{{ url_for('painel.cliente', cliente_id=k.cliente_id) }}">{{ k.cliente_nome }}</a>{% endif %}</div>
-            <p>{{ k.titulo }}</p>{% if k.observacao %}<p class="small muted">{{ k.observacao }}</p>{% endif %}
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <p class="vazio">Nenhum compromisso daqui para frente.</p>
+<div class="cabecalho">
+  <div class="stack-s"><span class="label">Atendimento: {{ horarios }}</span><h1>Agenda</h1></div>
+  <button class="btn btn-red" type="button" data-abrir-compromisso>Incluir compromisso</button>
+</div>
+
+<div class="cal-barra">
+  <div class="row">
+    <a class="btn btn-s" href="{{ url_for('painel.agenda', vista=vista, data=anterior.isoformat()) }}" aria-label="Anterior">‹</a>
+    <a class="btn btn-s" href="{{ url_for('painel.agenda', vista=vista, data=hoje.isoformat()) }}">Hoje</a>
+    <a class="btn btn-s" href="{{ url_for('painel.agenda', vista=vista, data=seguinte.isoformat()) }}" aria-label="Seguinte">›</a>
+    <h2 class="cal-titulo">{{ titulo_periodo }}</h2>
+  </div>
+  <nav class="segmentos" aria-label="Formato da agenda">
+    {% for chave, nome in [('mes', 'Mês'), ('semana', 'Semana'), ('dia', 'Dia')] %}
+    <a href="{{ url_for('painel.agenda', vista=chave, data=referencia.isoformat()) }}" class="{{ 'ativo' if vista == chave else '' }}">{{ nome }}</a>
     {% endfor %}
-  </div>
-  <div class="stack">
-    <div class="card soft">
-      <span class="label">Próximos horários livres para consulta</span>
-      {% for l in livres %}<p>{{ l | extenso }}</p>{% else %}<p class="small muted">Nenhum horário livre nos próximos 20 dias.</p>{% endfor %}
-      <p class="small muted">São estes que a Bivexa oferece aos clientes.</p>
+  </nav>
+</div>
+
+<div class="agenda-layout">
+  <section class="cal" aria-label="Calendário">
+  {% if vista == 'mes' %}
+    <div class="cal-mes">
+      {% for d in dias_semana %}<div class="cal-cab">{{ d }}</div>{% endfor %}
+      {% for d in dias %}
+        {% set itens = por_dia.get(d, []) %}
+        <div class="cal-celula {{ 'fora' if d.month != referencia.month else '' }} {{ 'hoje' if d == hoje else '' }}" data-dia="{{ d.isoformat() }}">
+          <div class="row between">
+            <a class="cal-num" href="{{ url_for('painel.agenda', vista='dia', data=d.isoformat()) }}">{{ d.day }}</a>
+            {% if vagas[d] %}<span class="cal-livres">{{ vagas[d] | length }} livres</span>{% endif %}
+          </div>
+          {% for k in itens[:3] %}{{ bloco(k) }}{% endfor %}
+          {% if itens | length > 3 %}<a class="small" href="{{ url_for('painel.agenda', vista='dia', data=d.isoformat()) }}">+{{ itens | length - 3 }} mais</a>{% endif %}
+        </div>
+      {% endfor %}
     </div>
-    <form method="post" class="card stack">
-      {{ csrf_campo() }}
-      <h3>Incluir compromisso</h3>
-      <label class="campo">Tipo<select name="tipo"><option value="consulta">Consulta</option><option value="audiência">Audiência</option><option value="prazo">Prazo</option><option value="reunião">Reunião</option><option value="compromisso">Outro</option></select></label>
-      <label class="campo">Descrição<input type="text" name="titulo" required></label>
-      <div class="grid-2"><label class="campo">Data<input type="date" name="data" required></label><label class="campo">Hora<input type="time" name="hora" value="09:00"></label></div>
-      <label class="campo">Cliente<select name="cliente_id"><option value="">Sem cliente</option>{% for c in clientes %}<option value="{{ c.id }}">{{ c.nome }}</option>{% endfor %}</select></label>
-      <button class="btn btn-red">Incluir</button>
-    </form>
-  </div>
-</section>
+  {% else %}
+    <div class="cal-grade" style="--colunas: {{ dias | length }}">
+      <div class="cal-canto"></div>
+      {% for d in dias %}
+        <a class="cal-cab-dia {{ 'hoje' if d == hoje else '' }}" href="{{ url_for('painel.agenda', vista='dia', data=d.isoformat()) }}">
+          <span>{{ dias_semana[d.weekday()] }}</span><strong>{{ d.day }}</strong>
+        </a>
+      {% endfor %}
+
+      <div class="cal-canto small muted">dia todo</div>
+      {% for d in dias %}
+        <div class="cal-dia-todo">
+          {% for k in por_dia.get(d, []) if eh_dia_todo(k) %}{{ bloco(k) }}{% endfor %}
+        </div>
+      {% endfor %}
+
+      <div class="cal-horas">
+        {% for hora in horas %}<span style="top: calc({{ loop.index0 }} * var(--hora))">{{ '%02d' % hora }}h</span>{% endfor %}
+      </div>
+      {% for d in dias %}
+        <div class="cal-coluna {{ 'hoje' if d == hoje else '' }}" style="height: calc({{ horas | length }} * var(--hora))" data-dia="{{ d.isoformat() }}">
+          {% for v in vagas[d] %}
+            {% set m = v.hour * 60 + v.minute - hora_ini * 60 %}
+            <button type="button" class="vaga" style="top: calc({{ m }} / 60 * var(--hora)); height: calc({{ duracao }} / 60 * var(--hora) - 3px)"
+                    data-abrir-compromisso data-data="{{ d.isoformat() }}" data-hora="{{ v.strftime('%H:%M') }}" data-tipo="consulta"
+                    title="Horário livre para consulta">livre · {{ v.strftime('%H:%M') }}</button>
+          {% endfor %}
+          {% for k in por_dia.get(d, []) if not eh_dia_todo(k) %}
+            {% set m = (k.inicio[11:13] | int) * 60 + (k.inicio[14:16] | int) - hora_ini * 60 %}
+            <div class="cal-pos" style="top: calc({{ [m, 0] | max }} / 60 * var(--hora)); height: calc({{ minutos_de(k) }} / 60 * var(--hora) - 3px)">{{ bloco(k) }}</div>
+          {% endfor %}
+          {% if d == hoje %}
+            {% set agora_m = now_minutos - hora_ini * 60 %}
+            {% if 0 <= agora_m <= horas | length * 60 %}<div class="cal-agora" style="top: calc({{ agora_m }} / 60 * var(--hora))"></div>{% endif %}
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <p class="small muted">Os blocos tracejados são horários livres de consulta: são eles que a Bivexa oferece aos clientes. Clique em um para marcar.</p>
+  {% endif %}
+  </section>
+
+  <aside class="stack">
+    <div class="card">
+      <span class="label">Próximos compromissos</span>
+      {% for k in proximos %}
+        <div class="proximo">
+          <div class="proximo-data"><strong>{{ k.inicio[8:10] }}/{{ k.inicio[5:7] }}</strong><span>{{ 'dia todo' if eh_dia_todo(k) else k.inicio[11:16] }}</span></div>
+          <div class="stack-s" style="gap:2px">
+            <span class="row" style="gap:6px"><span class="tag {{ 'red' if k.tipo == 'prazo' else '' }}">{{ k.tipo }}</span>{% if not k.confirmado %}<span class="tag warn">a confirmar</span>{% endif %}</span>
+            {% if k.cliente_id %}<a href="{{ url_for('painel.cliente', cliente_id=k.cliente_id) }}">{{ k.titulo }}</a>{% else %}<span>{{ k.titulo }}</span>{% endif %}
+          </div>
+        </div>
+      {% else %}
+        <p class="small muted">Nada marcado daqui para frente.</p>
+      {% endfor %}
+    </div>
+    <div class="card soft">
+      <span class="label">A marcar</span>
+      {% for c in a_marcar %}
+        <div class="row between" style="flex-wrap:nowrap">
+          <span class="stack-s" style="gap:0;min-width:0"><a href="{{ url_for('painel.cliente', cliente_id=c.id) }}">{{ c.nome }}</a>{% if c.urgente %}<span class="small" style="color:var(--red)">urgente</span>{% endif %}</span>
+          <button type="button" class="btn btn-s" data-abrir-compromisso data-tipo="consulta" data-cliente="{{ c.id }}">Marcar</button>
+        </div>
+      {% else %}
+        <p class="small muted">Todo cliente novo já tem consulta marcada.</p>
+      {% endfor %}
+    </div>
+  </aside>
+</div>
+
+<dialog class="modal" id="dlg-compromisso" aria-labelledby="dlg-titulo">
+  <form method="post" class="stack">
+    {{ csrf_campo() }}
+    <input type="hidden" name="vista" value="{{ vista }}">
+    <div class="row between"><h2 id="dlg-titulo">Incluir compromisso</h2><button type="button" class="btn-fechar" data-fechar aria-label="Fechar">×</button></div>
+    <label class="campo">Tipo<select name="tipo"><option value="consulta">Consulta</option><option value="audiência">Audiência</option><option value="prazo">Prazo</option><option value="reunião">Reunião</option><option value="compromisso">Outro</option></select></label>
+    <label class="campo">Descrição<input type="text" name="titulo" placeholder="Ex.: Consulta inicial – pensão alimentícia" required></label>
+    <div class="grid-2"><label class="campo">Data<input type="date" name="data" required></label><label class="campo">Hora<input type="time" name="hora" value="09:00"></label></div>
+    <label class="campo">Cliente<select name="cliente_id"><option value="">Sem cliente</option>{% for c in clientes %}<option value="{{ c.id }}" {{ 'selected' if c.id == cliente_sugerido else '' }}>{{ c.nome }}</option>{% endfor %}</select></label>
+    <label class="campo">Observação<input type="text" name="observacao" placeholder="Opcional"></label>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-fechar>Cancelar</button><button class="btn btn-red">Incluir</button></div>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  var dlg = document.getElementById('dlg-compromisso');
+  var f = dlg.querySelector('form');
+  function abrir(dados) {
+    f.reset();
+    f.data.value = dados.data || '{{ (hoje if referencia < hoje else referencia).isoformat() }}';
+    if (dados.hora) f.hora.value = dados.hora;
+    if (dados.tipo) f.tipo.value = dados.tipo;
+    if (dados.cliente) f.cliente_id.value = dados.cliente;
+    var nome = f.cliente_id.options[f.cliente_id.selectedIndex];
+    if (dados.tipo === 'consulta' && f.cliente_id.value) f.titulo.value = 'Consulta – ' + nome.text;
+    dlg.showModal();
+    f.titulo.focus();
+  }
+  document.querySelectorAll('[data-abrir-compromisso]').forEach(function (b) {
+    b.addEventListener('click', function () { abrir(b.dataset); });
+  });
+  // No mês, clicar no espaço vazio de um dia já abre o formulário com a data
+  document.querySelectorAll('.cal-celula').forEach(function (c) {
+    c.addEventListener('click', function (ev) { if (ev.target === c) abrir({ data: c.dataset.dia }); });
+  });
+  dlg.querySelectorAll('[data-fechar]').forEach(function (b) { b.addEventListener('click', function () { dlg.close(); }); });
+  dlg.addEventListener('click', function (ev) { if (ev.target === dlg) dlg.close(); });
+  {% if cliente_sugerido %}abrir({ tipo: 'consulta', cliente: '{{ cliente_sugerido }}' });{% endif %}
+})();
+</script>
 {% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base_painel.html" %}
+{% block titulo %}Captação · Bivexa AI{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <div class="stack-s"><span class="label">{{ total }} pessoa(s) em negociação</span><h1>Captação</h1></div>
+  <a class="btn btn-red" href="{{ url_for('painel.novo_cliente') }}">Cadastrar contato</a>
+</div>
+<p class="muted">Do primeiro contato ao contrato assinado. Quem chega pelo link de atendimento entra sozinho; quem chega por telefone ou indicação você cadastra.</p>
+<div class="funil">
+  {% for etapa, lista in colunas.items() %}
+  {% set nome, explicacao = info[etapa] %}
+  <div class="coluna">
+    <div class="stack-s" style="gap:2px">
+      <div class="row between" style="flex-wrap:nowrap"><span class="label">{{ nome }}</span><span class="contador">{{ lista | length }}</span></div>
+      <span class="small muted">{{ explicacao }}</span>
+    </div>
+    {% for item in lista %}
+      {% set c = item.c %}
+      <div class="mini {{ 'urgente' if c.urgente else '' }}">
+        <a class="mini-nome" href="{{ url_for('painel.cliente', cliente_id=c.id) }}">{{ c.nome }}</a>
+        <span class="small muted">{{ c.area or 'Área a definir' }}{% if c.parte_contraria %} · contra {{ c.parte_contraria }}{% endif %}</span>
+        {% if c.urgente or c.conflito %}<span class="row" style="gap:4px">{% if c.urgente %}<span class="tag red">urgente</span>{% endif %}{% if c.conflito %}<span class="tag warn">conflito</span>{% endif %}</span>{% endif %}
+        <p class="proximo-passo {{ 'alerta' if item.alerta else '' }}">{{ item.texto }}</p>
+        {% if item.botao %}<a class="btn btn-s {{ 'btn-outline-red' if item.alerta else '' }}" href="{{ item.botao[1] }}">{{ item.botao[0] }}</a>{% endif %}
+      </div>
+    {% else %}
+      <p class="small muted">Ninguém nesta etapa.</p>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

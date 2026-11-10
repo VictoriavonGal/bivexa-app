@@ -182,3 +182,98 @@ td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .por-bivexa { display: inline-flex; align-items: center; gap: 6px; }
 .por-bivexa svg { width: 18px; height: 18px; }
+
+/* agenda em calendário */
+.cal-barra { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cal-titulo { margin-left: 6px; font-size: 1.15rem; }
+.segmentos { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; background: var(--surface); }
+.segmentos a { padding: 5px 14px; border-radius: 999px; text-decoration: none; color: var(--muted); font-size: 0.85rem; font-weight: 600; }
+.segmentos a.ativo { background: var(--bg); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.agenda-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; align-items: start; }
+@media (max-width: 1100px) { .agenda-layout { grid-template-columns: minmax(0, 1fr); } }
+.cal { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+
+.cal-mes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.cal-cab { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 8px 10px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.cal-celula { min-height: 112px; padding: 6px 8px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; cursor: pointer; min-width: 0; }
+.cal-celula:nth-child(7n) { border-right: 0; }
+.cal-celula:hover { background: var(--surface); }
+.cal-celula.fora { background: var(--surface); }
+.cal-celula.fora .cal-num { color: var(--muted); }
+.cal-num { font-weight: 600; font-size: 0.85rem; color: var(--ink); text-decoration: none; width: 26px; height: 26px; display: inline-grid; place-items: center; border-radius: 999px; }
+.cal-celula.hoje .cal-num { background: var(--red); color: var(--on-red); }
+.cal-livres { font-family: var(--font-mono); font-size: 0.64rem; color: var(--ok); }
+.cal-mes .evento-cal { flex-direction: row; gap: 4px; padding: 2px 6px; }
+.cal-mes .evento-cal .ev-hora { flex: none; }
+
+.evento-cal { display: flex; flex-direction: column; gap: 0; min-width: 0; padding: 4px 7px; border-radius: 6px; font-size: 0.76rem; line-height: 1.3;
+  text-decoration: none; color: var(--ink); background: var(--surface-2); border-left: 3px solid var(--muted); overflow: hidden; }
+.evento-cal:hover { filter: brightness(0.97); }
+.evento-cal .ev-hora { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); }
+.evento-cal .ev-titulo { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+.evento-cal.tipo-consulta { background: var(--red-soft); border-left-color: var(--red); }
+.evento-cal.tipo-audiencia { background: var(--warn-soft); border-left-color: var(--warn); }
+.evento-cal.tipo-reuniao { background: var(--ok-soft); border-left-color: var(--ok); }
+.evento-cal.tipo-prazo { background: var(--red); border-left-color: var(--red-deep); color: var(--on-red); }
+.evento-cal.tipo-prazo .ev-hora { display: none; }
+.evento-cal.a-confirmar { border-left-style: dashed; opacity: .85; }
+
+.cal-grade { --hora: 52px; display: grid; grid-template-columns: 52px repeat(var(--colunas), minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.cal-canto { background: var(--surface); border-bottom: 1px solid var(--line); padding: 6px; font-size: 0.66rem; display: flex; align-items: center; }
+.cal-cab-dia { background: var(--surface); border-bottom: 1px solid var(--line); border-left: 1px solid var(--line); padding: 8px; display: flex; gap: 6px; align-items: baseline; justify-content: center; text-decoration: none; color: var(--muted); font-size: 0.78rem; text-transform: uppercase; font-family: var(--font-mono); }
+.cal-cab-dia strong { font-family: var(--font-display); font-size: 1.1rem; color: var(--ink); }
+.cal-cab-dia.hoje strong { color: var(--red); }
+.cal-dia-todo { border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 4px; display: flex; flex-direction: column; gap: 3px; min-height: 30px; min-width: 0; }
+.cal-horas { position: relative; }
+.cal-horas span { position: absolute; right: 8px; transform: translateY(-50%); font-family: var(--font-mono); font-size: 0.66rem; color: var(--muted); }
+.cal-horas span:first-child { transform: none; }
+.cal-coluna { position: relative; border-left: 1px solid var(--line); min-width: 0;
+  background-image: repeating-linear-gradient(to bottom, var(--line) 0, var(--line) 1px, transparent 1px, transparent var(--hora)); }
+.cal-coluna.hoje { background-color: color-mix(in srgb, var(--red-soft) 35%, transparent); }
+.cal-pos { position: absolute; left: 3px; right: 3px; display: flex; z-index: 2; }
+.cal-pos .evento-cal { flex: 1; }
+.vaga { position: absolute; left: 3px; right: 3px; z-index: 1; border: 1px dashed color-mix(in srgb, var(--ok) 55%, transparent); background: transparent; border-radius: 6px;
+  color: var(--ok); font: inherit; font-family: var(--font-mono); font-size: 0.64rem; text-align: left; padding: 2px 6px; cursor: pointer; opacity: .7; }
+.vaga:hover { opacity: 1; background: var(--ok-soft); }
+.cal-agora { position: absolute; left: 0; right: 0; height: 2px; background: var(--red); z-index: 3; }
+.cal-agora::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 999px; background: var(--red); }
+
+.proximo { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 0.88rem; }
+.proximo-data { display: flex; flex-direction: column; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+.proximo-data strong { font-family: var(--font-display); font-size: 0.95rem; color: var(--ink); }
+
+/* janela (modal) */
+dialog.modal { border: 1px solid var(--line); border-radius: 16px; padding: 22px; width: min(520px, calc(100vw - 32px)); background: var(--bg); color: var(--ink); box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+dialog.modal::backdrop { background: rgba(20, 10, 12, .45); }
+.btn-fechar { background: none; border: 0; font-size: 1.5rem; line-height: 1; color: var(--muted); cursor: pointer; }
+
+/* lista de clientes */
+.filtros { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.filtros .busca { flex: 1; min-width: 240px; border-radius: 999px; padding-left: 16px; }
+input[type=search] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); padding: 9px 12px; }
+.tabela-clientes td { vertical-align: middle; }
+.tabela-clientes tbody tr:hover { background: var(--surface); }
+.tabela-clientes tr.linha-urgente { box-shadow: inset 3px 0 0 var(--red); }
+.nome-cliente { font-weight: 600; color: var(--ink); text-decoration: none; }
+.nome-cliente:hover { color: var(--red); text-decoration: underline; }
+.etapa { display: inline-block; font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+.etapa-contratado { background: var(--ok-soft); color: var(--ok); }
+.etapa-proposta-aceita, .etapa-proposta-enviada { background: var(--warn-soft); color: var(--warn); }
+.etapa-novo-contato { background: var(--red-soft); color: var(--red-deep); }
+
+/* captação */
+.contador { font-family: var(--font-mono); font-size: 0.72rem; background: var(--bg); border-radius: 999px; padding: 1px 8px; }
+.mini-nome { font-weight: 600; color: var(--ink); text-decoration: none; }
+.mini-nome:hover { color: var(--red); }
+.proximo-passo { font-size: 0.8rem; padding-top: 6px; border-top: 1px dashed var(--line); margin-top: 2px; }
+.proximo-passo.alerta { color: var(--red-deep); font-weight: 600; }
+.mini .btn { align-self: flex-start; }
+
+/* prévia do que sai para o cliente */
+.previa { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.msg-previa { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; border-bottom-left-radius: 4px; padding: 10px 13px; font-size: 0.9rem; max-width: 62ch; white-space: pre-wrap; }
+.card.urgente .msg-previa { background: var(--bg); }
+.previa details summary { cursor: pointer; color: var(--red); }
+.previa details .documento { margin-top: 8px; max-height: 360px; overflow: auto; }
+.lista-docs { margin: 0; padding-left: 1.1em; font-size: 0.88rem; display: flex; flex-direction: column; gap: 2px; }
+.cal-mes .ev-conf { display: none; }

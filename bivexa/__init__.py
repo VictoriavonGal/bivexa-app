@@ -194,7 +194,7 @@ def _rotas_de_conta(app):
         """Entra numa conta de demonstração já configurada, com exemplos."""
         conta = banco.um("SELECT * FROM escritorio WHERE email = ?", EMAIL_DEMO)
         if conta is None:
-            eid = _criar_conta("Silva Advocacia (demonstração)", "Dra. Helena Silva", "SP 123.456",
+            eid = _criar_conta("Silva Advocacia", "Dra. Helena Silva", "SP 123.456",
                                EMAIL_DEMO, SENHA_DEMO)
             banco.executar("UPDATE escritorio SET configurado = 1, areas = ?, telefone = ? WHERE id = ?",
                            "Família, Trabalhista, Consumidor", "(11) 3000-0000", eid)
@@ -202,7 +202,7 @@ def _rotas_de_conta(app):
             servicos.carregar_exemplos(conta)
         session.clear()
         session["escritorio_id"] = conta["id"]
-        flash("Você está na conta de demonstração. Os dados marcados como EXEMPLO são fictícios.", "ok")
+        flash("Bem-vindo à demonstração: um escritório fictício, com clientes e casos inventados.", "ok")
         return redirect(url_for("painel.hoje"))
 
     @app.route("/sair", methods=["POST"])
