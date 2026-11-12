@@ -79,7 +79,9 @@ def _filtros(app):
     @app.context_processor
     def globais():
         return {"status_ia": ia.descricao_status(), "escritorio": g.get("escritorio"),
-                "csrf": session.get("csrf", ""), "eh_admin": bool(session.get("admin"))}
+                "csrf": session.get("csrf", ""), "eh_admin": bool(session.get("admin")),
+                # E-mail de atendimento da equipe Bivexa, mostrado no rodapé.
+                "contato_email": os.environ.get("CONTATO_EMAIL", "").strip()}
 
 
 # ---------------------------------------------------------------- segurança

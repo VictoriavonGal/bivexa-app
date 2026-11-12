@@ -18,3 +18,5 @@ services:
         sync: false
       - key: ADMIN_SENHA
         sync: false
+      - key: CONTATO_EMAIL
+        sync: false

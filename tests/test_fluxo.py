@@ -263,3 +263,10 @@ def test_vagas_nao_colidem_com_compromisso():
     assert datetime(2026, 11, 12, 14, 0) not in vagas
     assert datetime(2026, 11, 12, 15, 0) in vagas
     assert regras.vagas_do_dia("", 60, [], date(2026, 11, 14)) == []  # sábado
+
+
+def test_rodape_mostra_o_contato_quando_configurado(app, monkeypatch):
+    c = app.test_client()
+    assert "mailto:" not in c.get("/").get_data(as_text=True)
+    monkeypatch.setenv("CONTATO_EMAIL", "contato@bivexa.app")
+    assert "mailto:contato@bivexa.app" in c.get("/").get_data(as_text=True)

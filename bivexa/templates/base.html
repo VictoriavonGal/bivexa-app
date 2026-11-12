@@ -34,7 +34,7 @@
   </main>
   <footer class="rodape">
     <span>Bivexa AI · Projeto acadêmico · Insper 2026/2</span>
-    <span class="row"><a href="{{ url_for('privacidade') }}">Como tratamos os dados</a><a href="{{ url_for('admin.entrar') }}">Acesso da administração</a></span>
+    <span class="row">{% if contato_email %}<a href="mailto:{{ contato_email }}">Fale com a equipe: {{ contato_email }}</a>{% endif %}<a href="{{ url_for('privacidade') }}">Como tratamos os dados</a><a href="{{ url_for('admin.entrar') }}">Acesso da administração</a></span>
   </footer>
 </div>
 {% endblock %}
