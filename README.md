@@ -1,65 +1,100 @@
 # Bivexa AI
 
-**Mais horas para advogar.** A Bivexa é a assistente administrativa do advogado autônomo e do escritório boutique: atende o cliente novo, marca a consulta, prepara proposta e contrato, cobra os honorários e acompanha o processo. O advogado só aprova: nada sai em nome dele sem o seu "sim".
+**A secretária que o escritório do advogado autônomo ainda não pode contratar.** A Bivexa atende o cliente novo, marca a consulta, prepara proposta e contrato, cobra os honorários e acompanha as publicações do processo. O advogado só decide: nada sai em nome dele sem o seu "sim".
 
 Projeto da APS de Ciência de Dados Aplicada ao Direito I, Insper, 2026/2.
 
+## O problema, num caso
+
+Sexta, 22h. Um trabalhador escreve para a Dra. Helena, advogada que trabalha sozinha: foi demitido, e a empresa quer que ele assine um acordo na segunda às 9h. Ela só vê a mensagem no sábado à tarde, entre um prazo e outro. Até lá, ele já procurou outro escritório.
+
+Segundo a pesquisa Perfil ADV (OAB e FGV, 2024), 72% da advocacia brasileira atua de forma autônoma. Quem advoga sozinho também atende, agenda, faz proposta, cobra e acompanha processo, e esse trabalho administrativo ocupa as horas que deveriam ir para o caso.
+
+Com a Bivexa, a mensagem de sexta é respondida na hora. O relato é organizado, a urgência acende um alerta e a empresa do outro lado é conferida contra a lista de clientes (conflito de interesses). A consulta fica marcada num horário livre, e a pergunta "devo assinar?" fica para a advogada responder.
+
 ## Experimente
 
-- **Endereço público:** `https://bivexa-ai.onrender.com` *(confirme o endereço depois de publicar; ver "Como publicar")*
-- **Conta de demonstração:** na página inicial, clique em **Entrar na demonstração**. Ela abre um escritório fictício, já configurado, com clientes de exemplo.
-- **Conta nova:** clique em **Criar a conta do escritório**. O cadastro é real: e-mail, senha protegida e configuração em três passos.
+- **Endereço:** <https://bivexa-ai.onrender.com>. No plano gratuito, o primeiro acesso depois de um tempo parado demora cerca de 1 minuto.
+- **Conta de demonstração:** na página inicial, clique em **Ver a demonstração**. Abre um escritório fictício, já configurado, com clientes de exemplo.
+- **Conta nova:** clique em **Criar a conta do escritório**. O cadastro é real: e-mail, senha cifrada e configuração em três passos.
 
-Um roteiro de dois minutos para a banca:
+**Roteiro de dois minutos para a banca:**
 
-1. Entre na demonstração e abra **Abrir o atendimento ao cliente** numa janela anônima.
-2. Escreva como cliente: *"Fui demitido e a empresa quer que eu assine um acordo amanhã às 9h. Devo assinar?"*, depois um nome e, como empresa, **Transportes Ipê**.
-3. Veja a resposta: a assistente não opina, identifica a urgência e para antes de marcar a consulta, porque a Transportes Ipê já é cliente do escritório.
-4. Volte ao painel: em **Hoje** estão o alerta de urgência e o conflito de interesses, esperando a decisão do advogado.
-5. Abra **Registro de conduta**: tudo o que aconteceu está lá, com as verificações feitas.
+1. Entre na demonstração e, na tela **Hoje**, clique em **Abrir o atendimento ao cliente**. Abra o link numa janela anônima.
+2. Escreva como cliente: *"Fui demitido e a empresa quer que eu assine um acordo amanhã às 9h. Devo assinar?"*. Depois informe um nome e, como empresa, **Transportes Ipê**.
+3. Veja a resposta. A assistente não opina, reconhece a urgência e para antes de marcar a consulta, porque a Transportes Ipê já é cliente do escritório.
+4. Volte ao painel. Em **Hoje** estão o alerta de urgência e o conflito de interesses, esperando a decisão da advogada.
+5. Abra o **Registro de conduta**: tudo o que aconteceu está lá, com as verificações feitas.
 
-## Acesso da administração
+## Por que a Bivexa, e não o que o escritório já tem
 
-Para quem mantém a plataforma (a equipe Bivexa), sem OAB. Mostra a visão geral (escritórios, clientes, consultas, contratos, honorários, mensagens bloqueadas) e permite abrir o painel de qualquer escritório. Cada acesso fica gravado no registro de conduta do escritório.
-
-- **No seu computador:** já vem ligado. Endereço `http://127.0.0.1:5000/admin/entrar`, e-mail `admin@bivexa.app`, senha `admin-bivexa-2026` (aparecem no terminal ao rodar o app).
-- **No Render:** o acesso só liga depois que vocês definem `ADMIN_EMAIL` e `ADMIN_SENHA` no painel do serviço (Environment). Usem uma senha forte: o site é público.
-
-## Para quem é
-
-Para o advogado que atende os próprios clientes, faz os próprios contratos e cobra os próprios honorários, sem secretária. Segundo a pesquisa Perfil ADV (OAB e FGV, 2024), 72% da advocacia brasileira atua de forma autônoma.
-
-## O que o app faz
-
-| Tela | O que resolve |
+| Alternativa | O que falta para este problema |
 |---|---|
-| **Atendimento** (`/atendimento/<escritório>`) | Primeiro contato a qualquer hora: triagem, alerta de urgência, conferência de conflito de interesses e agendamento da consulta nos horários livres. Nunca dá opinião jurídica. |
-| **Hoje** | O que precisa do advogado agora: decisões pendentes, consultas dos próximos 7 dias com o resumo do caso, valores a receber e em atraso. |
-| **Aprovações** | A fila do "sim": proposta, contrato, primeira cobrança, datas de processo e avisos ao cliente. Cada item pode ser aprovado ou revisado. |
-| **Clientes** | O funil do escritório (novo contato → consulta → proposta → contrato) e a ficha de cada caso, com conversa, documentos a pedir e histórico. |
-| **Agenda** | Consultas, audiências e prazos; os horários livres que a Bivexa oferece aos clientes. |
-| **Financeiro** | Parcelas a aprovar, a vencer, em atraso e recebidas. Emissão e lembrete automáticos depois da primeira cobrança. |
-| **Processos** | Publicação lida, resumida, com a data sugerida para a agenda e o aviso ao cliente rascunhado. |
-| **Registro de conduta** | Tudo o que saiu em nome do advogado, com data, hora e as verificações feitas. |
-| **Configurações** | Horários, tabela de honorários, modelos de proposta e contrato, lista de conflitos. |
+| **Um assistente de uso geral** (ChatGPT, Gemini) com um bom comando | Responde a quem pergunta, mas não atende o cliente do escritório às 22h. Não tem a agenda do advogado, não confere conflito de interesses, não guarda o histórico do cliente e não impede que a resposta tenha opinião jurídica. |
+| **Software de gestão jurídica** | Em geral organiza processos e financeiro depois que alguém cadastra tudo. Esse alguém é a secretária que o autônomo não tem. |
+| **Agenda online e cobrança avulsas** | Cada ferramenta faz uma parte. Nenhuma delas cruza o cliente que marcou consulta com as partes contrárias dos outros casos, nem segura a proposta até o advogado aprovar. |
 
-O caminho completo de um cliente tem 12 etapas, e só 6 passam pelo advogado: ler a ficha, conduzir a consulta, aprovar a proposta, assinar o contrato, confirmar prazos e aprovar os avisos ao cliente.
+**O que a torna específica para advogados:**
 
-## Regras que o app segue
+- confere o conflito de interesses antes de marcar a consulta;
+- bloqueia opinião jurídica nas mensagens (Estatuto da Advocacia, art. 1º);
+- lê as publicações do processo;
+- mantém um registro de conduta de tudo o que saiu em nome do advogado.
 
-- **Nada sai sem o "sim" do advogado**, exceto mensagens administrativas (confirmação de horário e lembretes).
-- **Toda mensagem ao cliente é conferida** antes do envio contra frases de opinião jurídica ou promessa de resultado (`regras.verificar_mensagem`). Se a conferência falhar, a mensagem é bloqueada e vira uma pendência.
-- **Conflito de interesses** é conferido antes de qualquer consulta, contra a lista de clientes e partes contrárias.
-- **A Bivexa não conta prazo sozinha:** sugere a data e explica a conta; o advogado confere e confirma.
-- **Cada escritório só vê os próprios dados.**
+## Como a Bivexa chega ao resultado
+
+O caminho completo de um cliente tem 12 etapas, e só 6 passam pelo advogado: ler a ficha, conduzir a consulta, aprovar a proposta, assinar o contrato, confirmar as datas do processo e aprovar os avisos ao cliente.
+
+| Etapa | Quem faz | Como |
+|---|---|---|
+| Responder o primeiro contato | Regra fixa | Textos escritos no código, e não texto livre da IA |
+| Organizar o relato para o advogado | IA, com regra de reserva | O modelo resume o relato em até 3 frases neutras; sem IA, a regra copia o relato e marca a área |
+| Reconhecer urgência | Regra **e** IA | O alerta acende se qualquer um dos dois apontar urgência |
+| Conferir conflito de interesses | Regra fixa | Compara os nomes com a lista de clientes e partes contrárias do escritório |
+| Oferecer horários | Regra fixa | Horários de atendimento do escritório, menos o que já está na agenda |
+| Redigir o objeto da proposta | IA, com regra de reserva | A partir de uma frase do advogado; vai para a fila de aprovação |
+| Ler a publicação do processo | Regra **e** IA | A regra acha a data; a IA resume e rascunha o aviso ao cliente, que vai para aprovação |
+| Conferir cada mensagem antes do envio | Regra fixa | Lista de frases de opinião jurídica e promessa de resultado (`regras.verificar_mensagem`) |
+
+**O modelo:** Llama 3.3 70B, pelo [Groq](https://groq.com), no plano gratuito. Sem a chave `GROQ_API_KEY`, ou se a IA falhar, cada uma dessas funções usa as regras fixas de `bivexa/regras.py`, e o app continua funcionando. O canto inferior do painel mostra qual modo está ativo.
+
+## Quanto ela acerta
+
+Testamos as regras fixas com mensagens de cliente e rascunhos de resposta, marcando antes a resposta certa. O resultado completo, com cada erro, está em [`avaliacao/RESULTADOS.md`](avaliacao/RESULTADOS.md). Para refazer a conta: `uv run python -m avaliacao.avaliar`.
+
+O que aprendemos com o teste:
+
+- **As regras reconhecem bem as frases que conhecem e mal as que nunca viram.** Em casos escritos depois do último ajuste, o filtro de opinião jurídica deixou passar frases como "você será indenizado".
+- **Por isso o filtro é a segunda camada, e não a primeira.** As respostas automáticas são textos fixos. Todo texto novo (proposta, contrato, aviso de publicação, cobrança) espera o advogado, que vê o texto exato antes de enviar.
+- **O erro que mais pesa é a urgência perdida.** A IA faz uma segunda leitura do relato. Os próximos passos são medir a IA nos mesmos casos e testar com mensagens reais de um advogado.
+
+## O que a Bivexa não faz
+
+- **Não dá opinião jurídica nem avalia o caso.** Quando o cliente pergunta "tenho direito?", a resposta é que a advogada ou o advogado avalia na consulta.
+- **Não decide o que depende de interpretação.** Entendimentos divergentes, decisão ainda sujeita a recurso e casos parecidos que pedem caminhos diferentes ficam com o advogado. A Bivexa só organiza o que chega e prepara o que ele pediu.
+- **Não conta prazo sozinha.** Sugere a data em dias úteis, sem feriados nem suspensões, e explica a conta. O advogado confere e confirma.
+- **Não define preço nem estratégia.** Usa a tabela de honorários do próprio escritório.
+
+## Dados e sigilo
+
+| Pergunta | Resposta |
+|---|---|
+| Que dados a Bivexa guarda? | Dados do escritório; nome, contato e relato dos clientes; mensagens; agenda; propostas, contratos e parcelas; publicações coladas pelo advogado. |
+| O que fica de fora? | CPF e documentos não são pedidos no primeiro contato; só na hora do contrato. |
+| Onde ficam? | Num banco SQLite, no servidor do Render. No plano gratuito, o banco é apagado quando o serviço reinicia. |
+| Quem vê? | Cada escritório só vê os próprios dados: toda consulta ao banco filtra pelo escritório logado, e há teste automático para isso. A equipe Bivexa pode abrir o painel de um escritório para dar suporte, e **cada acesso fica gravado** no registro de conduta daquele escritório. |
+| E as senhas? | Guardadas só como hash (Werkzeug), sem como ler de volta. |
+| O que vai para a IA? | O relato do cliente, a frase do advogado sobre o serviço e o texto da publicação, só para gerar o resumo e os rascunhos. Sem a chave do Groq, nada sai do servidor. |
+| O que ainda falta para dados reais? | Esta é uma versão de demonstração: não use dados reais de clientes. Para uso de verdade, faltam banco com cópia de segurança, criptografia dos dados guardados e contrato de tratamento de dados com o provedor de IA (LGPD, art. 39). |
+
+## Regras do produto
+
+- **Nada sai sem o "sim" do advogado**, exceto mensagens administrativas (confirmação de horário e lembretes), que são textos fixos.
+- **Toda mensagem ao cliente é conferida antes do envio.** Se a conferência falhar, a mensagem é bloqueada e vira uma pendência.
+- **O conflito de interesses é conferido antes de qualquer consulta.**
+- **Tudo vai para o registro de conduta**, com data, hora e as verificações feitas.
 
 Essas regras vêm do Estatuto da Advocacia (Lei 8.906/1994, arts. 1º, 7º e 34), do Provimento 205/2021 e das recomendações do Conselho Federal da OAB sobre IA generativa (nov. 2024).
-
-## Inteligência artificial
-
-A IA (modelo de linguagem pelo [Groq](https://groq.com), plano gratuito) faz três coisas: a triagem do primeiro contato, o parágrafo de objeto da proposta e o resumo das publicações, com o aviso ao cliente.
-
-**Plano de reserva:** sem a chave `GROQ_API_KEY`, ou se a IA falhar, cada uma dessas funções usa regras fixas (`bivexa/regras.py`) e o app continua funcionando. Texto da IA que contenha opinião jurídica é descartado. O canto inferior do painel mostra qual modo está ativo.
 
 ## O que é simulado nesta versão
 
@@ -86,22 +121,28 @@ GROQ_API_KEY=sua_chave uv run python app.py
 
 No Windows (PowerShell): `$env:GROQ_API_KEY="sua_chave"; uv run python app.py`
 
+**Administração da plataforma**, para a equipe Bivexa: no seu computador, o acesso já vem ligado em `http://127.0.0.1:5000/admin/entrar`. O e-mail e a senha de teste aparecem no terminal ao rodar o app. No Render, o acesso só liga depois de definir `ADMIN_EMAIL` e `ADMIN_SENHA`.
+
 ## Testes
 
 ```bash
-uv run --group dev pytest
+uv run --group dev pytest              # testes automáticos
+uv run python -m avaliacao.avaliar     # quanto as regras acertam
 ```
 
-Os testes percorrem o caminho inteiro de um cliente (do primeiro contato ao pagamento), a urgência, o conflito de interesses, o bloqueio de opinião jurídica, o atraso de parcela, o isolamento entre escritórios e a camada de IA com e sem resposta do modelo.
+Os testes percorrem o caminho inteiro de um cliente, do primeiro contato ao pagamento. Também cobrem a urgência, o conflito de interesses, o bloqueio de opinião jurídica, o atraso de parcela, o isolamento entre escritórios e a camada de IA, com e sem resposta do modelo.
 
 ## Como publicar no Render
 
 1. Crie uma conta em [render.com](https://render.com), entrando com o GitHub.
 2. No painel, clique em **New → Blueprint** e escolha este repositório. O arquivo `render.yaml` já diz tudo o que o Render precisa.
-3. O Render vai pedir três valores: `GROQ_API_KEY` (a chave do Groq, ou em branco para usar só as regras fixas), `ADMIN_EMAIL` e `ADMIN_SENHA` (o login da administração).
+3. Preencha os valores pedidos:
+   - `GROQ_API_KEY`: a chave do Groq, ou em branco para usar só as regras fixas;
+   - `ADMIN_EMAIL` e `ADMIN_SENHA`: o login da administração;
+   - `CONTATO_EMAIL`: o e-mail de atendimento que aparece no rodapé do site.
 4. Clique em **Apply**. Em alguns minutos, o endereço aparece no topo da página do serviço.
 
-**Atenção:** no plano gratuito, o Render "dorme" depois de 15 minutos sem uso (o primeiro acesso demora cerca de 1 minuto) e apaga o banco de dados quando reinicia. A conta de demonstração é recriada sozinha. Abram o link alguns minutos antes da apresentação.
+**Atenção:** no plano gratuito, o Render "dorme" depois de 15 minutos sem uso e apaga o banco quando reinicia. A conta de demonstração é recriada sozinha. Abram o link alguns minutos antes da apresentação.
 
 ## Estrutura do código
 
@@ -115,21 +156,23 @@ bivexa/servicos.py      o que o produto faz: atender, aprovar, propor, contratar
 bivexa/painel.py        telas do advogado
 bivexa/admin.py         administração da plataforma (equipe Bivexa)
 bivexa/publico.py       telas do cliente: atendimento, proposta, contrato, pagamento
+bivexa/exemplos.py      o escritório fictício da demonstração
 bivexa/templates/       HTML das telas
 bivexa/static/          visual (CSS) e logo
 tests/                  testes automáticos
+avaliacao/              casos com a resposta certa e o cálculo de acerto
 ```
 
 ## Limitações conhecidas
 
+- As regras de texto reconhecem as frases que conhecem; frases novas escapam (ver `avaliacao/RESULTADOS.md`).
 - A contagem de prazo considera só dias úteis, sem feriados nem suspensões: por isso é sempre uma sugestão.
-- A conferência de opinião jurídica usa uma lista de frases; não substitui a leitura do advogado.
-- O banco SQLite atende bem um escritório pequeno; para muitos escritórios, o caminho é um banco como o PostgreSQL.
+- O banco SQLite atende bem um escritório pequeno. Para muitos escritórios, o caminho é um banco como o PostgreSQL.
 
 ## Licença
 
-Ver `LICENSE`. As bibliotecas usadas (Flask, Gunicorn, Requests) mantêm as próprias licenças abertas.
+Proprietária: o código é público para avaliação, mas não pode ser usado sem autorização (ver `LICENSE`). As bibliotecas usadas (Flask, Gunicorn, Requests) mantêm as próprias licenças abertas.
 
 ## Equipe
 
-*(nomes do grupo)*
+Bianca Quadros, Fabiana Blaauw, Sophia Mariotto, Stephanie Von Gal e Victoria Von Gal.
