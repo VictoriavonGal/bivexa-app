@@ -24,6 +24,7 @@ Na fase 1, a Bivexa era uma proposta: um site que prometia cuidar da parte não 
 - **"Do escritório de Dra. Helena Silva".** As mensagens ao cliente usavam o nome do advogado e ficavam erradas em português, porque o app não sabe se é "o Dr." ou "a Dra.". Reescrevemos para usar o nome do escritório.
 - **Texto da IA com opinião jurídica.** Previmos o caso: se o modelo escrever algo como "você vai ganhar", o texto é descartado e o app usa o modelo fixo. Há um teste automático para isso.
 - **Consulta marcada num sábado.** Ao refazer a demonstração com datas relativas a hoje (feedback do professor), a conversa dizia "quinta às 14h" e a agenda mostrava a consulta num sábado. Corrigimos fazendo os exemplos caírem sempre em dia útil e gerando o dia da semana da conversa a partir da data real. Um teste roda a demonstração em sete "hojes" diferentes.
+- **As regras acertavam os nossos exemplos, mas não frases novas.** Por causa do feedback da fase 1 ("mostrar que o produto foi testado e quanto ele acerta"), pedimos ao Claude uma avaliação com a resposta certa marcada antes de rodar (`avaliacao/`). Na primeira rodada, o filtro de opinião jurídica deixou passar "suas chances são muito boas", e a urgência não reconhecia "me bateu ontem" nem "até sexta". As regras foram ajustadas e a primeira rodada passou a acertar quase tudo. Mas um segundo conjunto, escrito depois do ajuste, mostrou que o ajuste tinha decorado as frases: "você será indenizado" continuou passando. Decidimos não ajustar de novo e deixar o número honesto no README. Lição: um teste em que o produto acerta 100% pode estar medindo o teste, e não o produto. O que protege o cliente é a aprovação do advogado, e não a lista de palavras.
 - [grupo: incluam aqui o que der errado quando vocês mesmos testarem e publicarem.]
 
 ## 4. Custo e limite
@@ -38,4 +39,5 @@ Na fase 1, a Bivexa era uma proposta: um site que prometia cuidar da parte não 
 
 1. Testar o produto com um advogado autônomo de verdade antes de fechar as telas, e não só com os nossos exemplos.
 2. Escrever os testes com os exemplos do pitch logo no começo, porque foram eles que pegaram o erro da urgência.
-3. [grupo]
+3. Separar desde o início os casos usados para ajustar as regras dos casos usados para medir, para não descobrir no fim que o acerto estava inflado.
+4. [grupo]

@@ -18,10 +18,12 @@ Bivexa AI: assistente administrativa para o advogado autônomo e o escritório b
 3. **Toda ação relevante vai para o registro de conduta** (`servicos.registrar`).
 4. **Toda consulta ao banco filtra por `escritorio_id`.** Use a função `meu()` em `painel.py` para buscar itens do escritório logado.
 5. **A IA é opcional.** Toda função de `ia.py` precisa ter plano de reserva com regras fixas.
+6. **Não ajuste as regras olhando para os casos novos de `avaliacao/casos.py`.** Eles medem o que as regras fazem com frases que nunca viram. Se mudar uma regra, rode `uv run python -m avaliacao.avaliar` e registre a mudança no commit; para medir de novo, escreva casos novos.
 
 ## Como rodar
 
 ```bash
 uv run python app.py              # app em http://127.0.0.1:5000
 uv run --group dev pytest         # testes
+uv run python -m avaliacao.avaliar  # quanto as regras acertam (grava avaliacao/RESULTADOS.md)
 ```
