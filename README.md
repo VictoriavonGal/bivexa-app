@@ -75,6 +75,18 @@ O que aprendemos com o teste:
 - **Não conta prazo sozinha.** Sugere a data em dias úteis, sem feriados nem suspensões, e explica a conta. O advogado confere e confirma.
 - **Não define preço nem estratégia.** Usa a tabela de honorários do próprio escritório.
 
+## Preço
+
+**R$ 199 por mês, por escritório, com 30 dias grátis.** É uma proposta do grupo, ainda não testada com clientes. A conta por trás dela:
+
+| Comparação | Valor por mês |
+|---|---|
+| Secretária em escritório de advocacia (média do Infojobs, sem encargos) | cerca de R$ 2.050 |
+| Software de gestão jurídica para autônomos (Astrea, plano Up, nov. 2026) | R$ 209 |
+| **Bivexa** | **R$ 199** |
+
+A Bivexa custa menos de um décimo de uma secretária e fica na faixa do que o autônomo já paga por software de gestão. O custo de operação é baixo: hospedagem e IA cabem em planos gratuitos ou baratos enquanto houver poucos escritórios.
+
 ## Dados e sigilo
 
 | Pergunta | Resposta |
