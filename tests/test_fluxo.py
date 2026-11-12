@@ -270,3 +270,23 @@ def test_rodape_mostra_o_contato_quando_configurado(app, monkeypatch):
     assert "mailto:" not in c.get("/").get_data(as_text=True)
     monkeypatch.setenv("CONTATO_EMAIL", "contato@bivexa.app")
     assert "mailto:contato@bivexa.app" in c.get("/").get_data(as_text=True)
+
+
+
+def test_roteiro_da_banca_para_no_conflito(app):
+    """O roteiro do README, como a banca faria: entra na demonstração e, como
+    cliente, reclama da Transportes Ipê, que é cliente do escritório. A Bivexa
+    marca a urgência e não oferece horário antes da decisão da advogada."""
+    adv = app.test_client()
+    r = post(adv, "/demonstracao")
+    assert "Precisa de você" in r.get_data(as_text=True)
+    _, html = conversar(app, "silva-advocacia", [
+        "Fui demitido e a empresa quer que eu assine um acordo amanhã às 9h. Devo assinar?",
+        "Rafael Moreira", "Transportes Ipê", "(11) 98888-0000"])
+    assert "Não posso orientar sobre o caso" in html
+    assert "estes horários" not in html
+    with app.app_context():
+        c = um("SELECT * FROM cliente WHERE nome = 'Rafael Moreira'")
+    assert c["urgente"] and "cliente do escritório" in c["conflito"]
+    hoje = adv.get("/painel/").get_data(as_text=True)
+    assert "conflito de interesses" in hoje.lower()

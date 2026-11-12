@@ -455,5 +455,11 @@ def carregar(escritorio):
         f"Processo 1004321-55.2026.8.26.0002. Fica designada audiência de conciliação para {data_aud}, às 14h, "
         "por videoconferência. Intimem-se as partes.")
 
+    # Cliente empresarial antigo do escritório, só na lista de conflitos. É ele que
+    # faz o roteiro da banca (README) parar no conflito de interesses: o trabalhador
+    # que reclama da "Transportes Ipê" não pode ser atendido sem a decisão da advogada.
+    executar("INSERT INTO parte (escritorio_id, nome, papel, observacao) VALUES (?, ?, 'cliente', ?)",
+             d.eid, "Transportes Ipê Ltda.", "cliente em contrato de assessoria contínua desde 2024")
+
     servicos.registrar(d.eid, "Bivexa", "Exemplos de demonstração carregados", "17 clientes, 5 processos.")
     return pid_carlos
