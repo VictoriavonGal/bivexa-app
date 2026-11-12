@@ -125,7 +125,17 @@ FRASES_PROIBIDAS = [
     "com certeza", "garanto", "garantimos", "certamente", "nao assine", "pode assinar",
     "deve assinar", "nao deve assinar", "e crime", "nao e crime", "o juiz vai",
     "a justica vai", "voce vai receber", "causa ganha", "sem risco",
+    # Incluídas depois da avaliação de 12/11 (avaliacao/RESULTADOS.md):
+    # avaliação do caso e conselho sobre o que fazer.
+    "ilegal", "chances", "vitorios", "vale a pena", "nao compensa", "compensa entrar",
+    "da para processar", "pode processar", "prescricao", "prescreveu",
 ]
+
+# Conselho sobre o que o cliente deve fazer no caso: "recomendo aceitar",
+# "sugiro recorrer". Recomendações administrativas ("recomendo chegar 10
+# minutos antes") continuam permitidas.
+CONSELHO = re.compile(r"\b(recomendo|sugiro|aconselho)\b.{0,15}\b(aceitar|recusar|assinar|recorrer|"
+                      r"processar|desistir|fechar|nao)\b")
 
 # Perguntas do cliente que pedem opinião sobre o caso.
 PEDIDOS_DE_OPINIAO = [
@@ -133,7 +143,14 @@ PEDIDOS_DE_OPINIAO = [
     "assino ou nao", "o que eu faco", "o que faco", "e crime", "quanto vou receber",
     "vale a pena", "tenho chance", "minhas chances", "e legal", "e ilegal",
     "eles podem", "ela pode", "ele pode", "posso processar",
+    # Incluídas depois da avaliação de 12/11:
+    "compensa", "e possivel fazer algo", "da para fazer algo", "tem como reverter",
 ]
+
+# "O banco pode negativar...?", "Meu chefe pode descontar...?": perguntar se
+# alguém pode fazer algo contra o cliente é pedir uma avaliação jurídica.
+PODE_FAZER = re.compile(r"\bpodem? (me )?(descontar|negativar|cobrar|demitir|despejar|cortar|"
+                        r"reter|bloquear|penhorar|tomar|proibir|exigir)")
 
 RESPOSTA_SEM_OPINIAO = (
     "Entendo a sua dúvida. Eu sou a assistente virtual do escritório e não posso "
@@ -149,6 +166,9 @@ def verificar_mensagem(texto):
     """
     normal = sem_acento(texto)
     achadas = [f for f in FRASES_PROIBIDAS if f in normal]
+    conselho = CONSELHO.search(normal)
+    if conselho:
+        achadas.append(conselho.group(0))
     verificacoes = [
         "sem opinião jurídica" if not achadas else "OPINIÃO JURÍDICA DETECTADA",
         "sem promessa de resultado",
@@ -160,7 +180,7 @@ def verificar_mensagem(texto):
 
 def pede_opiniao(texto):
     normal = sem_acento(texto)
-    return any(p in normal for p in PEDIDOS_DE_OPINIAO)
+    return any(p in normal for p in PEDIDOS_DE_OPINIAO) or bool(PODE_FAZER.search(normal))
 
 
 # ---------------------------------------------------------------- urgência
@@ -187,23 +207,41 @@ SINAIS_URGENCIA = [
     ("oficial de justica", "cumprimento de ordem judicial"),
     ("liminar", "decisão liminar"),
     ("urgente", "o cliente informou urgência"),
+    # Incluídas depois da avaliação de 12/11:
+    ("me bateu", "risco à integridade de alguém"),
+    ("bateu em mim", "risco à integridade de alguém"),
+    ("me bate", "risco à integridade de alguém"),
+    ("medo de voltar", "risco à integridade de alguém"),
+    ("mandado", "cumprimento de ordem judicial"),
+    ("trocar a fechadura", "despejo iminente"),
+    ("trocam a fechadura", "despejo iminente"),
 ]
 
 
 # Uma palavra de tempo curto + uma palavra de ato jurídico também é urgência,
 # mesmo que não estejam lado a lado ("assine um acordo amanhã").
-TEMPO_CURTO = ["amanha", "hoje", "agora", "esta noite", "hoje a noite", "em 24 horas", "em 48 horas"]
+TEMPO_CURTO = ["amanha", "hoje", "agora", "esta noite", "hoje a noite", "em 24 horas", "em 48 horas",
+               "depois de amanha", "esta semana", "fim da semana",
+               "ate segunda", "ate terca", "ate quarta", "ate quinta", "ate sexta", "ate sabado"]
+
+# "tenho 5 dias para", "prazo de 3 dias": prazo curto escrito em número.
+PRAZO_CURTO = re.compile(r"\b([1-9]|1[0-5]) dias? (uteis )?(para|pra)\b")
 ATOS = [("assin", "documento para assinar em breve"), ("acordo", "acordo a ser fechado em breve"),
         ("audiencia", "audiência próxima"), ("prazo", "prazo vencendo"), ("pericia", "perícia próxima"),
         ("despejo", "despejo iminente"), ("leilao", "leilão próximo"), ("intimad", "intimação com data próxima"),
-        ("citad", "citação com data próxima")]
+        ("citad", "citação com data próxima"), ("defesa", "defesa com prazo próximo"),
+        ("entregar", "entrega com prazo próximo"), ("sair d", "desocupação iminente")]
 
 
 def detectar_urgencia(texto):
     normal = sem_acento(texto)
+    # "não é urgente" não pode virar alerta só por conter a palavra "urgente".
+    normal = re.sub(r"nao (e|eh|esta|parece) urgente", "", normal)
     for sinal, motivo in SINAIS_URGENCIA:
         if sinal in normal:
             return True, motivo
+    if PRAZO_CURTO.search(normal):
+        return True, "prazo de poucos dias"
     if any(re.search(rf"\b{t}\b", normal) for t in TEMPO_CURTO):
         for ato, motivo in ATOS:
             if ato in normal:
