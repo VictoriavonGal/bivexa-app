@@ -3,7 +3,13 @@
 Cada caso foi escrito como um cliente ou um rascunho real escreveria, e a
 resposta certa foi decidida ANTES de rodar a avaliação.
 
-Os casos servem para medir, e não para treinar as regras.
+Há dois conjuntos:
+- PRIMEIRO_CONTATO e MENSAGENS_AO_CLIENTE: a primeira rodada. Depois dela,
+  as regras foram ajustadas olhando para os erros, então o acerto nestes
+  casos é otimista.
+- PRIMEIRO_CONTATO_NOVOS e MENSAGENS_AO_CLIENTE_NOVOS: escritos depois dos
+  ajustes. Medem o que as regras fazem com frases que nunca viram, e são o
+  número a citar.
 
 Primeiro contato do cliente:
     texto, urgente (há data próxima ou risco à pessoa?), pede_opiniao
@@ -102,3 +108,48 @@ MENSAGENS_AO_CLIENTE = [
     ("A advogada pediu que você não deixe de trazer o documento do acordo.", False),
 ]
 
+
+# ---------------------------------------------------------------------------
+# Casos novos: escritos DEPOIS dos ajustes de 12/11 nas regras, sem rodar as
+# regras antes de marcar a resposta. Medem se os ajustes valem para frases
+# que as regras nunca viram. Não ajuste as regras olhando para estes casos:
+# quando errarem, escreva um terceiro conjunto para medir de novo.
+
+PRIMEIRO_CONTATO_NOVOS = [
+    ("Me chamaram para depor na semana que vem e não sei se preciso de advogado.", True, True, "Criminal"),
+    ("Minha ex não deixa eu ver meu filho desde o Natal.", False, False, "Família"),
+    ("O juiz marcou a audiência para o dia 3 e hoje já é dia 1.", True, False, "A definir"),
+    ("Estou sendo cobrado por um empréstimo que nunca fiz.", False, False, "Consumidor"),
+    ("Meu companheiro quebrou meu celular e disse que vai me matar.", True, False, "Família"),
+    ("O despejo está marcado para a próxima terça.", True, False, "Imobiliário"),
+    ("A firma me mandou embora e não pagou as férias.", False, False, "Trabalhista"),
+    ("Recebi uma carta do fórum dizendo que tenho 15 dias para contestar.", True, False, "A definir"),
+    ("Quero saber se dá para pedir revisão da minha aposentadoria.", False, True, "Previdenciário"),
+    ("Meu voo foi cancelado e perdi o casamento da minha irmã.", False, False, "Consumidor"),
+    ("A construtora atrasou a entrega do apartamento em dois anos.", False, False, "Imobiliário"),
+    ("Querem que eu assine a confissão de dívida ainda hoje.", True, False, "A definir"),
+    ("Sou MEI e um cliente não me paga há seis meses.", False, False, "Empresarial"),
+    ("Será que eu consigo a guarda dos meus netos?", False, True, "Família"),
+    ("O leilão do meu carro é na quarta.", True, False, "A definir"),
+    ("Fui agredido pelo segurança do mercado.", True, False, "Criminal"),
+    ("Preciso de um contrato de prestação de serviços para minha loja.", False, False, "Empresarial"),
+    ("Meu benefício do INSS foi cortado sem aviso.", False, False, "Previdenciário"),
+    ("A empresa pode me obrigar a voltar ao presencial?", False, True, "Trabalhista"),
+    ("Minha mãe está internada e o plano de saúde quer suspender o tratamento amanhã.", True, False, "Consumidor"),
+]
+
+MENSAGENS_AO_CLIENTE_NOVOS = [
+    ("Seu caso é bem simples, deve se resolver rápido a seu favor.", True),
+    ("A outra parte não tem razão nenhuma.", True),
+    ("Pelo valor envolvido, acho melhor fazer um acordo.", True),
+    ("O seu empregador não podia ter feito isso.", True),
+    ("Você será indenizado.", True),
+    ("Nesse tipo de situação, a lei está do seu lado.", True),
+    ("Sugiro aguardar a decisão antes de pagar qualquer valor.", True),
+    ("Sua consulta foi remarcada para segunda, às 10h.", False),
+    ("Recomendo chegar 10 minutos antes da consulta.", False),
+    ("O boleto da segunda parcela já está disponível.", False),
+    ("A advogada recebeu os documentos e vai analisá-los.", False),
+    ("Houve uma nova movimentação no seu processo. Vamos explicar na próxima conversa.", False),
+    ("Lembramos que a consulta de amanhã será por vídeo.", False),
+]
